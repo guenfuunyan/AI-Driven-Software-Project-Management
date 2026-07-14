@@ -1,0 +1,2 @@
+This file is a placeholder for an architecture diagram image.
+Suggested content: a simple Mermaid or ASCII diagram showing frontend, backend, database, and AI services.
