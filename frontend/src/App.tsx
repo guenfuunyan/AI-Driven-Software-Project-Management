@@ -1,8 +1,23 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
-import { MainLayout } from './layouts/MainLayout';
-import { Dashboard } from './pages/Dashboard';
-import { ProjectList } from './pages/ProjectList';
+import Layout from './components/Layout';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import ProjectsPage from './pages/ProjectsPage';
+import SprintPage from './pages/SprintPage';
+import StoriesPage from './pages/StoriesPage';
+import TasksPage from './pages/TasksPage';
+import RisksPage from './pages/RisksPage';
+import ForecastPage from './pages/ForecastPage';
+import AIPage from './pages/AIPage';
+import ReportsPage from './pages/ReportsPage';
+import SettingsPage from './pages/SettingsPage';
+import { useAuthStore } from './store/auth';
+
+function ProtectedRoute() {
+  const token = useAuthStore((s) => s.token);
+  return token ? <Layout /> : <Navigate to="/login" replace />;
+}
 
 function App() {
   return (
@@ -15,16 +30,25 @@ function App() {
         },
       }}
     >
-      <Router>
-        <Routes>
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="projects" element={<ProjectList />} />
-            <Route path="ai-assistant" element={<div className="p-4">AI Assistant Interface Coming Soon</div>} />
-            <Route path="settings" element={<div className="p-4">Settings Coming Soon</div>} />
-          </Route>
-        </Routes>
-      </Router>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        
+        {/* Protected routes wrapped with auth check and main sidebar layout */}
+        <Route element={<ProtectedRoute />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="projects" element={<ProjectsPage />} />
+          <Route path="sprint" element={<SprintPage />} />
+          <Route path="stories" element={<StoriesPage />} />
+          <Route path="tasks" element={<TasksPage />} />
+          <Route path="risks" element={<RisksPage />} />
+          <Route path="forecast" element={<ForecastPage />} />
+          <Route path="ai" element={<AIPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </ConfigProvider>
   );
 }

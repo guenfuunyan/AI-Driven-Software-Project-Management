@@ -1,0 +1,181 @@
+@startuml ERD_Diagram
+!theme plain
+skinparam fontName "Segoe UI"
+skinparam fontSize 11
+skinparam shadow false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+title **SƠ ĐỒ QUAN HỆ THỰC THỂ - LIÊN KẾT (ENTITY-RELATIONSHIP DIAGRAM - ERD)**
+
+' ==========================================
+' ENTITIES & ATTRIBUTES
+' ==========================================
+
+entity "user" as User {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * username : VARCHAR(100) <<UNIQUE>>
+    * email : VARCHAR(255) <<UNIQUE>>
+    * hashed_password : VARCHAR(255)
+    full_name : VARCHAR(255)
+    * role : VARCHAR(50) -- 'admin', 'pm', 'developer', 'viewer'
+    is_active : BOOLEAN
+    created_at : DATETIME
+    updated_at : DATETIME
+    deleted_at : DATETIME
+}
+
+entity "project" as Project {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * name : VARCHAR(255)
+    description : TEXT
+    status : VARCHAR(50) -- 'active', 'completed', 'on_hold'
+    created_by_id : INTEGER <<FK>>
+    created_at : DATETIME
+    updated_at : DATETIME
+    deleted_at : DATETIME
+}
+
+entity "sprint" as Sprint {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * project_id : INTEGER <<FK>>
+    * name : VARCHAR(255)
+    goal : TEXT
+    status : VARCHAR(50) -- 'planned', 'active', 'completed'
+    start_date : DATETIME
+    end_date : DATETIME
+    created_at : DATETIME
+    updated_at : DATETIME
+    deleted_at : DATETIME
+}
+
+entity "userstory" as UserStory {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * project_id : INTEGER <<FK>>
+    sprint_id : INTEGER <<FK>>
+    feature_id : INTEGER
+    * title : VARCHAR(255)
+    description : TEXT
+    acceptance_criteria : TEXT
+    status : VARCHAR(50) -- 'todo', 'in_progress', 'review', 'done'
+    story_points : INTEGER
+    priority : INTEGER
+    created_at : DATETIME
+    updated_at : DATETIME
+    deleted_at : DATETIME
+}
+
+entity "task" as Task {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * project_id : INTEGER <<FK>>
+    sprint_id : INTEGER <<FK>>
+    story_id : INTEGER <<FK>>
+    assignee_id : INTEGER <<FK>>
+    * title : VARCHAR(255)
+    description : TEXT
+    status : VARCHAR(50) -- 'todo', 'in_progress', 'review', 'done'
+    story_points : INTEGER
+    due_date : DATETIME
+    -- DevOps & AI Governance Parameters --
+    automation_level : FLOAT -- 0.0 to 1.0
+    risk_level : FLOAT -- 0.0 to 1.0
+    ai_cost_estimate : FLOAT -- Token Cost ($)
+    collaboration_mode : VARCHAR(20) -- 'HITL', 'HOTL', 'HOOL'
+    created_at : DATETIME
+    updated_at : DATETIME
+    deleted_at : DATETIME
+}
+
+entity "risk" as Risk {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * project_id : INTEGER <<FK>>
+    * title : VARCHAR(255)
+    description : TEXT
+    category : VARCHAR(50) -- 'schedule', 'technical', 'resource', 'data'
+    probability : FLOAT -- 0.0 to 1.0
+    impact : FLOAT -- 0.0 to 1.0
+    risk_score : FLOAT -- P * I
+    mitigation : TEXT
+    status : VARCHAR(50) -- 'open', 'mitigated', 'closed'
+    created_at : DATETIME
+    updated_at : DATETIME
+    deleted_at : DATETIME
+}
+
+entity "forecast" as Forecast {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * project_id : INTEGER <<FK>>
+    sprint_id : INTEGER <<FK>>
+    forecast_type : VARCHAR(50) -- 'velocity', 'burndown', 'ann'
+    predicted_velocity : FLOAT
+    remaining_points : FLOAT
+    completion_probability : FLOAT
+    burndown_notes : TEXT
+    created_at : DATETIME
+}
+
+entity "aijob" as AIJob {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    user_id : INTEGER <<FK>>
+    * job_type : VARCHAR(50) -- 'analyze', 'story_point', 'breakdown', 'risk', 'forecast', 'assign'
+    * status : VARCHAR(50) -- 'pending', 'running', 'completed', 'failed'
+    payload : TEXT
+    result : TEXT
+    created_at : DATETIME
+    updated_at : DATETIME
+}
+
+entity "aiagent" as AIAgent {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    * name : VARCHAR(100)
+    * agent_type : VARCHAR(50) -- 'requirement', 'planning', 'task', 'risk', 'forecast', 'assign'
+    description : TEXT
+    system_prompt : TEXT
+    model_name : VARCHAR(100)
+    is_active : BOOLEAN
+    created_at : DATETIME
+    updated_at : DATETIME
+}
+
+entity "auditlog" as AuditLog {
+    * **id** : INTEGER <<PK, AutoIncrement>>
+    --
+    user_id : INTEGER <<FK>>
+    * action : VARCHAR(100)
+    * entity_type : VARCHAR(100)
+    entity_id : INTEGER
+    details : TEXT
+    created_at : DATETIME
+}
+
+' ==========================================
+' RELATIONSHIPS & CARDINALITIES
+' ==========================================
+
+User ||--o{ Project : "quản lý / tạo (created_by_id)"
+User ||--o{ Task : "được phân công (assignee_id)"
+User ||--o{ AIJob : "thực thi tác vụ AI"
+User ||--o{ AuditLog : "phát sinh nhật ký"
+
+Project ||--|{ Sprint : "chứa (1-N)"
+Project ||--|{ UserStory : "thuộc về (1-N)"
+Project ||--|{ Task : "chứa (1-N)"
+Project ||--o{ Risk : "phát hiện rủi ro (1-N)"
+Project ||--o{ Forecast : "được dự báo (1-N)"
+
+Sprint ||--o{ UserStory : "nằm trong Sprint (0-N)"
+Sprint ||--o{ Task : "phân bổ Task (0-N)"
+Sprint ||--o{ Forecast : "dự báo điểm Sprint (0-N)"
+
+UserStory ||--o{ Task : "phân rã thành Task (1-N)"
+
+@enduml

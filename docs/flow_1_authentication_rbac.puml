@@ -1,0 +1,91 @@
+@startuml Flow_1_Authentication_RBAC
+!theme plain
+autonumber
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam shadow false
+skinparam boxPadding 10
+
+actor "Người dùng (User)" as User
+participant "🎨 Frontend (React App)" as FE
+participant "🔑 Auth Store (Zustand)" as Store
+participant "☕ API Gateway / Security" as Gateway
+participant "🐍 Auth Microservice (FastAPI)" as Auth
+database "🗄️ Database (SQLite)" as DB
+
+box "Client Side (Trình duyệt)" #f8fafc
+    actor User
+    participant FE
+    participant Store
+end box
+
+box "Server Side (Backend Microservices)" #f1f5f9
+    participant Gateway
+    participant Auth
+    participant DB
+end box
+
+title **LUỒNG 1: QUẢN TRỊ & XÁC THỰC NGƯỜI DÙNG (USER AUTHENTICATION & RBAC GOVERNANCE FLOW)**
+
+' --- Step 1: User Login ---
+User -> FE : 1. Nhập Username & Password\nvà nhấn "Đăng nhập"
+activate FE
+
+FE -> Auth : 2. POST /api/auth/login (username, password)
+activate Auth
+
+Auth -> DB : 3. Query người dùng trong bảng `user` theo username
+activate DB
+DB --> Auth : 4. Trả về thông tin User & Password Hash
+deactivate DB
+
+Auth -> Auth : 5. Kiểm tra Password Hash (Bcrypt)\n& Trạng thái Tài khoản (ACTIVE)
+
+alt Mật khẩu chính xác
+    Auth -> Auth : 6. Sinh OAuth2 JWT Token chứa\n(sub, role, exp) dựa trên vai trò (Admin/PM/Dev/Viewer)
+    
+    Auth -> DB : 7. Ghi nhận thời gian đăng nhập & Audit Log
+    activate DB
+    DB --> Auth : 8. Xác nhận ghi log
+    deactivate DB
+
+    Auth --> FE : 9. Trả về JWT Token & Thông tin User (200 OK)
+    
+    FE -> Store : 10. Lưu Token & User State vào Zustand Store & LocalStorage
+    activate Store
+    Store --> FE : 11. Cập nhật State thành công
+    deactivate Store
+
+    FE --> User : 12. Chuyển hướng đến Dashboard theo vai trò RBAC
+else Sai thông tin đăng nhập
+    Auth --> FE : 13. Trả về Lỗi 401 Unauthorized ("Tên đăng nhập hoặc mật khẩu không đúng")
+    deactivate Auth
+    FE --> User : 14. Hiển thị Thông báo Lỗi Đăng nhập
+end
+
+' --- Step 2: Accessing Protected API ---
+== Truy cập Trang / API Được bảo vệ (Protected Resource Request) ==
+
+User -> FE : 15. Truy cập tính năng Quản lý (Ví dụ: /projects, /tasks)
+FE -> Gateway : 16. HTTP Request với Header: `Authorization: Bearer <JWT Token>`
+activate Gateway
+
+Gateway -> Gateway : 17. Giải mã & Kiểm tra chữ ký JWT (Verify Token Signature)
+
+alt Token Hợp lệ & Đủ Quyền Role RBAC
+    Gateway -> Gateway : 18. Kiểm tra Quyền Hạn (Admin/PM/Dev/Viewer)
+    Gateway -> DB : 19. Thực thi Lấy / Cập nhật Dữ liệu
+    activate DB
+    DB --> Gateway : 20. Trả về Dữ liệu kết quả
+    deactivate DB
+    Gateway --> FE : 21. HTTP 200 OK với Dữ liệu Dịch vụ
+    FE --> User : 22. Hiển thị Giao diện theo Quyền Vai trò RBAC
+else Token Hết hạn hoặc Khác vai trò bị Cấm (Forbidden)
+    Gateway --> FE : 23. HTTP 403 Forbidden ("Truy cập bị hạn chế do không đủ quyền RBAC")
+    deactivate Gateway
+    FE --> User : 24. Hiển thị Banner Thông báo Quyền Hạn Read-Only / Bị Cấm
+end
+
+deactivate FE
+
+@enduml

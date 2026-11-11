@@ -1,0 +1,120 @@
+@startuml Flow_4_AI_Estimation_Breakdown
+!theme plain
+autonumber
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam shadow false
+skinparam boxPadding 10
+
+actor "PM / Developer" as User
+participant "🎨 Frontend (StoriesPage UI)" as FE
+participant "☕ API Gateway (Spring Boot)" as Gateway
+participant "🐍 AI Microservice (FastAPI)" as AI
+participant "🎯 Planning Agent (Story Point)" as SPAgent
+participant "⚡ Task Agent (Breakdown)" as TaskAgent
+database "🗄️ Database (SQLite)" as DB
+
+box "Client Side (Trình duyệt)" #f8fafc
+    actor User
+    participant FE
+end box
+
+box "AI Agents & Core System" #f1f5f9
+    participant Gateway
+    participant AI
+    participant SPAgent
+    participant TaskAgent
+    participant DB
+end box
+
+title **LUỒNG 4: PHÂN RÃ & ƯỚC LƯỢNG CÔNG VIỆC BẰNG AI (AI STORY POINT ESTIMATION & TASK BREAKDOWN FLOW)**
+
+' === PART A: STORY POINT ESTIMATION ===
+== Phần A: Ước lượng Story Points bằng AI (Fibonacci Estimation) ==
+
+User -> FE : 1. Chọn User Story & Nhấn "🎯 Ước lượng SP bằng AI"
+activate FE
+
+FE -> Gateway : 2. POST /api/ai/story-point (story_id, description)
+activate Gateway
+
+Gateway -> AI : 3. Forward Payload đến AI Microservice
+activate AI
+
+AI -> SPAgent : 4. Gửi User Story đến Planning Agent
+activate SPAgent
+
+SPAgent -> SPAgent : 5. Phân tích độ phức tạp thuật toán,\nsố lượng màn hình UI, tích hợp DB & Rủi ro
+
+SPAgent -> SPAgent : 6. Quy đổi độ phức tạp ra thang điểm Fibonacci\n(1, 2, 3, 5, 8, 13, 21 SP) kèm lý giải
+
+SPAgent --> AI : 7. Trả về JSON Result { estimated_sp, reasoning }
+deactivate SPAgent
+
+AI --> Gateway : 8. Response HTTP 200 OK
+deactivate AI
+
+Gateway --> FE : 9. Trả về thông tin SP dự báo
+deactivate Gateway
+
+FE -> FE : 10. Mở Modal "🎯 Ước lượng Story Points bằng AI"\nCho phép người dùng tùy chọn chọn lại điểm Fibonacci (1 - 21)
+
+User -> FE : 11. Nhấn "✅ Áp dụng Story Point"
+FE -> Gateway : 12. PUT /api/stories/{id} (story_points)
+activate Gateway
+Gateway -> DB : 13. UPDATE cột `story_points` trong bảng `userstory`
+activate DB
+DB --> Gateway : 14. Xác nhận cập nhật
+deactivate DB
+Gateway --> FE : 15. Response 200 OK
+deactivate Gateway
+FE --> User : 16. Hiển thị Badge điểm SP mới trên giao diện
+
+' === PART B: TASK BREAKDOWN ===
+== Phần B: Tự động Phân rã Task Kỹ thuật (AI Task Breakdown) ==
+
+User -> FE : 17. Chọn User Story & Nhấn "⚡ Phân rã Task"
+
+FE -> Gateway : 18. POST /api/ai/breakdown (story_id, text)
+activate Gateway
+
+Gateway -> AI : 19. Forward Request đến AI Microservice
+activate AI
+
+AI -> TaskAgent : 20. Khởi chạy Task Agent
+activate TaskAgent
+
+TaskAgent -> TaskAgent : 21. Bóc tách User Story thành các Task kỹ thuật con\nkèm thông số: automation_level, risk_level, ai_cost_estimate
+
+TaskAgent --> AI : 22. Trả về Danh sách JSON Sub-tasks
+deactivate TaskAgent
+
+AI -> DB : 23. Ghi audit log vào bảng `aijob`
+activate DB
+DB --> AI : 24. Xác nhận lưu
+deactivate DB
+
+AI --> Gateway : 25. Response 200 OK
+deactivate AI
+
+Gateway --> FE : 26. Response JSON chứa Danh sách Tasks gợi ý
+deactivate Gateway
+
+FE -> FE : 27. Mở Modal "⚡ Phân rã Công việc bằng AI"\nCho phép chọn Sprint đích & sửa đổi danh sách Task
+
+User -> FE : 28. Chọn Sprint & Nhấn "✅ Nhập N công việc vào Sprint"
+FE -> Gateway : 29. POST /api/tasks/bulk (sprint_id, tasks_list)
+activate Gateway
+
+Gateway -> DB : 30. INSERT danh sách Tasks mới vào bảng `task`
+activate DB
+DB --> Gateway : 31. Xác nhận lưu thành công
+deactivate DB
+
+Gateway --> FE : 32. Response 201 Created
+deactivate Gateway
+
+FE --> User : 33. Cập nhật Bảng Kanban & Thông báo Toast "Đã nhập N tasks mới!"
+deactivate FE
+
+@enduml

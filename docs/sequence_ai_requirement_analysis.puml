@@ -1,0 +1,99 @@
+@startuml Sequence_AI_Requirement_Analysis
+!theme plain
+autonumber
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam shadow false
+skinparam boxPadding 10
+
+actor "Project Manager (PM)" as PM
+participant "🎨 Frontend UI (StoriesPage.tsx)" as FE
+participant "☕ API Gateway (Spring Security)" as Gateway
+participant "🐍 AI Microservice (FastAPI)" as AI
+participant "🔍 AI Requirement Agent" as Agent
+database "🗄️ Database (SQLite)" as DB
+
+box "Client Side (Trình duyệt)" #f8fafc
+    actor PM
+    participant FE
+end box
+
+box "Server Side & AI Agents" #f1f5f9
+    participant Gateway
+    participant AI
+    participant Agent
+    participant DB
+end box
+
+title **SEQUENCE DIAGRAM - QUY TRÌNH PHÂN TÍCH & LÀM RÕ YÊU CẦU BẰNG AI**
+
+' === STEP 1: USER INPUT & REQUEST ===
+PM -> FE : 1. Nhập văn bản Yêu cầu / User Story sơ bộ\nvà nhấn nút "🔍 Phân tích AI"
+activate FE
+
+FE -> FE : 2. Kiểm tra tính hợp lệ của văn bản nhập (non-empty text)
+
+FE -> Gateway : 3. HTTP POST /api/ai/analyze\nHeader: Authorization: Bearer <JWT Token>\nPayload: { text: "Mô tả yêu cầu..." }
+activate Gateway
+
+Gateway -> Gateway : 4. Xác thực JWT Signature & Kiểm tra Quyền RBAC (PM / Developer)
+
+Gateway -> AI : 5. Forward REST Payload đến AI Microservice (Port 8000)
+activate AI
+
+' === STEP 2: AI AGENT PROCESSING ===
+AI -> AI : 6. Xử lý chuẩn hóa chuỗi đầu vào (_clean_input_text)
+
+AI -> Agent : 7. Nạp System Prompt Template & Khởi chạy Requirement Agent
+activate Agent
+
+Agent -> Agent : 8. Phân tích ngữ nghĩa văn bản, xác định vai trò người dùng (Role),\nmục tiêu (Goal) & giá trị mang lại (Benefit)
+
+Agent -> Agent : 9. Đánh giá Điểm Khả thi Kỹ thuật (Feasibility Score 0-100%)\nvà phát hiện các điểm nghẽn / thiếu sót kỹ thuật
+
+Agent -> Agent : 10. Tự động sinh danh sách Tiêu chí Chấp nhận\n(Acceptance Criteria theo định dạng Given-When-Then)
+
+Agent --> AI : 11. Trả về Kết quả JSON Cấu trúc (Structured Output):\n{ analysis_summary, feasibility_score, acceptance_criteria }
+deactivate Agent
+
+' === STEP 3: AUDIT LOGGING & RESPONSE ===
+AI -> DB : 12. INSERT bản ghi tác vụ vào Bảng `aijob` (job_type = 'analyze', status = 'completed')
+activate DB
+DB --> AI : 13. Ghi log audit thành công
+deactivate DB
+
+AI --> Gateway : 14. Response HTTP 200 OK với JSON Result
+deactivate AI
+
+Gateway --> FE : 15. Forward HTTP 200 OK Response
+deactivate Gateway
+
+' === STEP 4: UI MODAL DISPLAY & USER DECISION ===
+FE -> FE : 16. Mở Hộp thoại (Modal) "Phân tích Chi tiết Yêu cầu AI"\nRender Tóm tắt Phân tích, Badge Độ Khả thi & Acceptance Criteria
+
+PM -> FE : 17. Xem xét thông tin & Quyết định hành động
+
+alt PM Chấp nhận Kết quả AI
+    PM -> FE : 18a. Nhấn nút "✅ Áp dụng & Thêm vào Backlog"
+    
+    FE -> Gateway : 19a. POST /api/stories (sprint_id, title, description, acceptance_criteria)
+    activate Gateway
+    
+    Gateway -> DB : 20a. INSERT đối tượng User Story mới vào Bảng `userstory`
+    activate DB
+    DB --> Gateway : 21a. Lưu dữ liệu thành công
+    deactivate DB
+    
+    Gateway --> FE : 22a. HTTP 201 Created Response
+    deactivate Gateway
+    
+    FE -> FE : 23a. Cập nhật Danh sách User Stories trên giao diện
+    FE --> PM : 24a. Đóng Modal & Hiển thị Toast "Đã tạo User Story từ AI thành công!"
+else PM Bỏ qua Results
+    PM -> FE : 18b. Nhấn nút "Đóng / Hủy"
+    FE --> PM : 19b. Đóng Modal không thay đổi dữ liệu Database
+end
+
+deactivate FE
+
+@enduml

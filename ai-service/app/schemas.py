@@ -41,6 +41,8 @@ class UserRead(BaseModel):
         orm_mode = True
 
 
+
+
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     email: Optional[EmailStr] = None
@@ -74,6 +76,8 @@ class ProjectRead(BaseModel):
         orm_mode = True
 
 
+
+
 class ProjectMemberCreate(BaseModel):
     user_id: int
     role: str = "developer"
@@ -88,6 +92,8 @@ class ProjectMemberRead(BaseModel):
 
     class Config:
         orm_mode = True
+
+
 
 
 # Epic / Feature / Story
@@ -111,6 +117,8 @@ class EpicRead(BaseModel):
         orm_mode = True
 
 
+
+
 class FeatureCreate(BaseModel):
     title: str
     description: Optional[str] = None
@@ -127,6 +135,8 @@ class FeatureRead(BaseModel):
 
     class Config:
         orm_mode = True
+
+
 
 
 class UserStoryCreate(BaseModel):
@@ -171,6 +181,8 @@ class UserStoryRead(BaseModel):
         orm_mode = True
 
 
+
+
 # Sprint
 class SprintCreate(BaseModel):
     name: str
@@ -200,6 +212,8 @@ class SprintRead(BaseModel):
 
     class Config:
         orm_mode = True
+
+
 
 
 # Task
@@ -256,6 +270,8 @@ class TaskRead(BaseModel):
         orm_mode = True
 
 
+
+
 # Risk
 class RiskCreate(BaseModel):
     title: str
@@ -294,6 +310,8 @@ class RiskRead(BaseModel):
         orm_mode = True
 
 
+
+
 # Forecast
 class ForecastRead(BaseModel):
     id: int
@@ -308,6 +326,8 @@ class ForecastRead(BaseModel):
 
     class Config:
         orm_mode = True
+
+
 
 
 # Comment
@@ -329,6 +349,8 @@ class CommentRead(BaseModel):
         orm_mode = True
 
 
+
+
 # Notification
 class NotificationRead(BaseModel):
     id: int
@@ -341,6 +363,8 @@ class NotificationRead(BaseModel):
 
     class Config:
         orm_mode = True
+
+
 
 
 # Release
@@ -364,6 +388,8 @@ class ReleaseRead(BaseModel):
 
     class Config:
         orm_mode = True
+
+
 
 
 # Dashboard / Reports
@@ -440,6 +466,8 @@ class AIAgentRead(BaseModel):
         orm_mode = True
 
 
+
+
 class AIJobRead(BaseModel):
     id: int
     agent_id: int
@@ -452,3 +480,121 @@ class AIJobRead(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+
+
+# Autonomous Multi-Agent Deliberation & Conflict Resolution
+class DeliberateRequest(BaseModel):
+    user_story: str
+    project_id: Optional[int] = None
+    sprint_id: Optional[int] = None
+    acceptance_criteria: Optional[str] = None
+    context: Optional[dict] = None
+
+
+class AgentThoughtDetail(BaseModel):
+    agent_role: str
+    agent_name: str
+    role_title: str
+    verdict: str
+    thinking_process: str
+    score: float
+    score_label: str
+    estimated_points: int
+    risk_level: str
+    key_arguments: list[str] = []
+    concerns_and_tradeoffs: str
+
+
+class ConflictItem(BaseModel):
+    id: str
+    category: str
+    severity: str
+    opposing_agents: list[str] = []
+    description: str
+    impact_analysis: str
+
+
+class TradeoffOption(BaseModel):
+    option_id: str
+    title: str
+    description: str
+    pros: list[str] = []
+    cons: list[str] = []
+    points: int
+    target_sprint: str
+    favored_agent: str
+
+
+class DeliberationResponse(BaseModel):
+    deliberation_id: int
+    topic: str
+    agents_thoughts: list[AgentThoughtDetail]
+    conflict_severity: float
+    conflict_level: str
+    conflicts_detected: list[ConflictItem] = []
+    governance_mode: str
+    final_verdict: str
+    reconciled_points: int
+    consensus_summary: str
+    actionable_plan: list[str] = []
+    tradeoff_analysis: str
+    hitl_options: list[TradeoffOption] = []
+    status: str
+
+
+class ResolveHITLRequest(BaseModel):
+    selected_option: str
+    custom_notes: Optional[str] = None
+
+
+class DeliberationRead(BaseModel):
+    id: int
+    project_id: Optional[int]
+    sprint_id: Optional[int]
+    topic: str
+    status: str
+    conflict_severity: float
+    conflict_level: str
+    governance_mode: str
+    final_decision: Optional[str]
+    reconciled_points: Optional[int]
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+# Autonomous Agent Action & Execution Schemas
+class AgentActionExecuteRequest(BaseModel):
+    action_record_id: int
+    custom_notes: Optional[str] = None
+
+
+class AgentRollbackRequest(BaseModel):
+    action_record_id: int
+
+
+class AgentActionRecordRead(BaseModel):
+    id: int
+    job_id: Optional[int]
+    project_id: Optional[int]
+    agent_type: str
+    action_type: str
+    title: str
+    description: Optional[str]
+    governance_mode: str
+    status: str
+    action_payload: str
+    execution_result: Optional[str]
+    created_at: datetime
+    executed_at: Optional[datetime]
+    rolled_back_at: Optional[datetime]
+
+    class Config:
+        orm_mode = True
+
+
+
+

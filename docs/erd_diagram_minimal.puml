@@ -1,0 +1,80 @@
+@startuml ERD_Diagram_Minimal
+!theme plain
+skinparam fontName "Segoe UI"
+skinparam fontSize 11
+skinparam shadow false
+skinparam linetype ortho
+
+title **SƠ ĐỒ ERD CỰC RÚT GỌN (ULTRA-CONCISE ERD)**
+
+entity "user" as User {
+    * **id** : PK
+    username : string
+    role : string
+}
+
+entity "project" as Project {
+    * **id** : PK
+    name : string
+    status : string
+}
+
+entity "sprint" as Sprint {
+    * **id** : PK
+    * project_id : FK
+    name : string
+}
+
+entity "userstory" as UserStory {
+    * **id** : PK
+    * project_id : FK
+    sprint_id : FK
+    title : string
+    story_points : int
+}
+
+entity "task" as Task {
+    * **id** : PK
+    * story_id : FK
+    assignee_id : FK
+    title : string
+    status : string
+    collaboration_mode : string
+}
+
+entity "risk" as Risk {
+    * **id** : PK
+    * project_id : FK
+    title : string
+    risk_score : float
+}
+
+entity "forecast" as Forecast {
+    * **id** : PK
+    * project_id : FK
+    predicted_velocity : float
+}
+
+entity "aijob" as AIJob {
+    * **id** : PK
+    user_id : FK
+    job_type : string
+    status : string
+}
+
+' === QUAN HỆ CHÍNH ===
+User ||--o{ Project : "tạo"
+User ||--o{ Task : "thực hiện"
+User ||--o{ AIJob : "chạy AI"
+
+Project ||--|{ Sprint : "chứa"
+Project ||--|{ UserStory : "có"
+Project ||--o{ Risk : "có rủi ro"
+Project ||--o{ Forecast : "dự báo"
+
+Sprint ||--o{ UserStory : "gán"
+Sprint ||--o{ Task : "phân bổ"
+
+UserStory ||--o{ Task : "phân rã"
+
+@enduml

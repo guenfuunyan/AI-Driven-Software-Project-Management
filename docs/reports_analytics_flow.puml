@@ -1,0 +1,67 @@
+@startuml Reports_Analytics_Flow
+!theme plain
+autonumber
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam shadow false
+
+actor "User (PM / Viewer)" as User
+participant "🎨 Frontend (React + Recharts)" as FE
+participant "☕ API Gateway (Spring Boot)" as Gateway
+participant "🐍 AI Service (FastAPI)" as AI
+participant "📈 Forecast Agent (ANN Engine)" as ForecastAgent
+database "🗄️ Database (SQLite)" as DB
+
+box "Người dùng & Frontend UI" #f8fafc
+    actor User
+    participant FE
+end box
+
+box "Hệ thống Backend & Analytics Engine" #f1f5f9
+    participant Gateway
+    participant AI
+    participant ForecastAgent
+    participant DB
+end box
+
+title **LUỒNG BÁO CÁO AGILE & DỰ BÁO TIẾN ĐỘ ANN (REPORTS & FORECAST FLOW)**
+
+User -> FE : 1. Truy cập trang "Báo cáo" hoặc "Dự báo" & chọn Dự án / Sprint
+activate FE
+
+FE -> Gateway : 2. Gửi các request đồng thời (Parallel Fetching):\n- GET /api/dashboard/burndown/{sprint_id}\n- GET /api/dashboard/velocity/{project_id}\n- GET /api/forecasts/projects/{project_id}
+activate Gateway
+
+Gateway -> AI : 3. Forward Requests đến AI Microservice
+activate AI
+
+par Lấy dữ liệu Burndown
+    AI -> DB : 4a. Query danh sách Task theo Sprint (Ideal vs Remaining SP)
+    activate DB
+    DB --> AI : 5a. Trả về dãy điểm Burndown theo ngày
+    deactivate DB
+else Lấy dữ liệu Velocity
+    AI -> DB : 4b. Query tổng điểm Task 'done' của tất cả các Sprint
+    activate DB
+    DB --> AI : 5b. Trả về danh sách Velocity (Sprint 1, 2, 3...)
+    deactivate DB
+else Dự báo bằng Mạng Nơ-ron (ANN)
+    AI -> ForecastAgent : 4c. Truyền dữ liệu tiến độ cho Forecast Agent
+    activate ForecastAgent
+    ForecastAgent -> ForecastAgent : 5c. Tính toán xác suất hoàn thành,\ntốc độ dự kiến & dự báo ngày đóng Sprint
+    ForecastAgent --> AI : 6c. Trả về kết quả dự báo ANN
+    deactivate ForecastAgent
+end
+
+AI --> Gateway : 6. Tổng hợp dữ liệu JSON Response
+deactivate AI
+
+Gateway --> FE : 7. Trả về dữ liệu Báo cáo & Dự báo
+deactivate Gateway
+
+FE -> FE : 8. Vẽ biểu đồ Recharts AreaChart (Burndown)\n& Recharts BarChart (Velocity) & Render Thẻ Dự báo ANN
+
+FE --> User : 9. Hiển thị Giao diện Báo cáo trực quan
+deactivate FE
+
+@enduml

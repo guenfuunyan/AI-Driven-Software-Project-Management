@@ -251,3 +251,73 @@ class AuditLog(SQLModel, table=True):
     entity_id: Optional[int] = None
     details: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class AgentDeliberation(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    project_id: Optional[int] = Field(default=None, foreign_key="project.id", index=True)
+    sprint_id: Optional[int] = Field(default=None, foreign_key="sprint.id", index=True)
+    user_story_id: Optional[int] = Field(default=None, foreign_key="userstory.id", index=True)
+    user_id: Optional[int] = Field(default=None, foreign_key="user.id", index=True)
+    topic: str
+    status: str = Field(default="completed", index=True)  # "pending_hitl", "completed", "rejected"
+    conflict_severity: float = Field(default=0.0)
+    conflict_level: str = Field(default="NONE")  # "NONE", "MODERATE", "CRITICAL"
+    governance_mode: str = Field(default="HOTL", index=True)  # "HITL", "HOTL", "HOOL"
+    final_decision: Optional[str] = None
+    reconciled_points: Optional[int] = None
+    consensus_summary: Optional[str] = None
+    actionable_plan: Optional[str] = None
+    tradeoff_analysis: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class AgentThought(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    deliberation_id: int = Field(foreign_key="agentdeliberation.id", index=True)
+    agent_role: str = Field(index=True)  # "po_agent", "tech_lead_agent", "scrum_master_agent"
+    agent_name: str
+    verdict: str  # e.g., "ACCEPT_IMMEDIATELY", "REQUIRE_SPIKE_REFACTOR", "DEFER_NEXT_SPRINT"
+    thinking_process: str  # Chain-of-thought markdown / text
+    score: float = Field(default=0.0)  # Primary metric (1-10)
+    estimated_points: Optional[int] = None
+    risk_level: str = Field(default="LOW")  # "LOW", "MEDIUM", "HIGH", "CRITICAL"
+    key_arguments: Optional[str] = None  # JSON list or formatted bullet points
+    concerns_and_tradeoffs: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class DeliberationResolution(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    deliberation_id: int = Field(foreign_key="agentdeliberation.id", index=True)
+    resolution_type: str = Field(default="ARBITRATION")  # "ARBITRATION" or "HITL"
+    selected_option: Optional[str] = None
+    approved_by_user_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    resolution_notes: Optional[str] = None
+    resolved_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class AgentActionRecord(SQLModel, table=True):
+    """
+    Stores autonomous actions proposed or executed by AI Agents.
+    Supports HITL manual approval, HOTL live intervention, and HOOL auto-rollback.
+    """
+    id: Optional[int] = Field(default=None, primary_key=True)
+    job_id: Optional[int] = Field(default=None, foreign_key="aijob.id", index=True)
+    project_id: Optional[int] = Field(default=None, foreign_key="project.id", index=True)
+    user_id: Optional[int] = Field(default=None, foreign_key="user.id", index=True)
+    agent_type: str = Field(index=True)
+    action_type: str = Field(index=True)  # e.g., "create_tasks_batch", "assign_tasks", "update_story_points", "record_risk"
+    title: str = Field(default="Autonomous Action")
+    description: Optional[str] = None
+    governance_mode: str = Field(default="HITL", index=True)  # "HITL", "HOTL", "HOOL"
+    status: str = Field(default="pending", index=True)  # "pending", "executed", "rejected", "rolled_back"
+    action_payload: str = Field(default="{}")  # JSON string
+    execution_result: Optional[str] = None  # JSON string
+    rollback_payload: Optional[str] = None  # JSON snapshot to restore original state
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    executed_at: Optional[datetime] = None
+    rolled_back_at: Optional[datetime] = None
+
+

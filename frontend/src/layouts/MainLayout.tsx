@@ -16,7 +16,7 @@ const { Header, Sider, Content } = Layout;
 export const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { colorBgContainer },
   } = theme.useToken();
   const location = useLocation();
 

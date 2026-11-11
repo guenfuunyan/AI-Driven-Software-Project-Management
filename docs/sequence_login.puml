@@ -1,0 +1,91 @@
+@startuml Sequence_Login
+!theme plain
+autonumber
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam shadow false
+skinparam boxPadding 10
+
+actor "Người dùng (User)" as User
+participant "🎨 Frontend UI (LoginPage.tsx)" as FE
+participant "🔑 Auth Store (Zustand)" as Store
+participant "☕ API Gateway (Spring Security)" as Gateway
+participant "🐍 Auth Service (FastAPI)" as Auth
+database "🗄️ Database (SQLite)" as DB
+
+box "Client Side (Trình duyệt)" #f8fafc
+    actor User
+    participant FE
+    participant Store
+end box
+
+box "Server Side (Backend Services)" #f1f5f9
+    participant Gateway
+    participant Auth
+    participant DB
+end box
+
+title **SEQUENCE DIAGRAM - QUY TRÌNH ĐĂNG NHẬP & XÁC THỰC NGUYÊN THỂ (JWT AUTHENTICATION)**
+
+' === STEP 1: USER INPUT ===
+User -> FE : 1. Nhập Tên đăng nhập (Username) & Mật khẩu (Password)\nvà nhấn nút "Đăng nhập"
+activate FE
+
+FE -> FE : 2. Kiểm tra tính hợp lệ của dữ liệu nhập (Client-side Validation)
+
+' === STEP 2: POST LOGIN REQUEST ===
+FE -> Gateway : 3. POST /api/auth/login (Content-Type: application/x-www-form-urlencoded)\nPayload: username, password
+activate Gateway
+
+Gateway -> Auth : 4. Forward HTTP Request đến Auth Service (Port 8000)
+activate Auth
+
+' === STEP 3: DATABASE VERIFICATION ===
+Auth -> DB : 5. SELECT * FROM user WHERE username = ?
+activate DB
+DB --> Auth : 6. Trả về đối tượng User (chứa password_hash, role, status)
+deactivate DB
+
+' === STEP 4: PASSWORD & STATUS CHECK ===
+Auth -> Auth : 7. Kiểm tra trạng thái tài khoản (status == 'ACTIVE')
+
+alt Tài khoản bị khóa hoặc không tồn tại
+    Auth --> Gateway : 8a. Trả về HTTP 401 Unauthorized ("Tài khoản bị khóa hoặc không tồn tại")
+    Gateway --> FE : 9a. Response HTTP 401 Unauthorized
+    FE --> User : 10a. Hiển thị thông báo "Tài khoản không hợp lệ"
+else Tài khoản hoạt động (ACTIVE)
+    Auth -> Auth : 8b. Mật mã hóa & so sánh Mật khẩu bằng Bcrypt Hasher
+    
+    alt Mật khẩu sai
+        Auth --> Gateway : 9b. Trả về HTTP 401 Unauthorized ("Tên đăng nhập hoặc mật khẩu không chính xác")
+        Gateway --> FE : 10b. Response HTTP 401 Unauthorized
+        FE --> User : 11b. Hiển thị thông báo "Sai mật khẩu, vui lòng thử lại"
+    else Mật khẩu chính xác
+        ' === STEP 5: TOKEN GENERATION & AUDIT LOG ===
+        Auth -> Auth : 12. Sinh OAuth2 JWT Access Token chứa Claims:\n{ sub: username, role: role, exp: expiration_timestamp }
+        
+        Auth -> DB : 13. UPDATE user SET last_login_at = NOW()\nvà INSERT vào bảng auditlog (action = 'LOGIN_SUCCESS')
+        activate DB
+        DB --> Auth : 14. Ghi DB thành công
+        deactivate DB
+
+        Auth --> Gateway : 15. HTTP 200 OK Payload:\n{ access_token, token_type: 'bearer', user: { username, role, full_name, email } }
+        deactivate Auth
+
+        Gateway --> FE : 16. HTTP 200 OK với JWT Token & Thông tin User
+        deactivate Gateway
+
+        ' === STEP 6: CLIENT STATE PERSISTENCE & REDIRECT ===
+        FE -> Store : 17. Gọi setToken(token) & setUser(user)\nLưu Token vào Zustand State & LocalStorage
+        activate Store
+        Store --> FE : 18. Cập nhật State thành công
+        deactivate Store
+
+        FE -> FE : 19. Khởi tạo Quyền hạn RBAC theo Vai trò (Admin / PM / Dev / Viewer)
+
+        FE --> User : 20. Chuyển hướng màn hình sang Bảng điều khiển (/dashboard)\nkèm Banner "Đăng nhập thành công với vai trò <Role>"
+        deactivate FE
+    end
+end
+
+@enduml

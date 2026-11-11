@@ -1,0 +1,75 @@
+@startuml Requirement_Analysis_Flow
+!theme plain
+autonumber
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam shadow false
+skinparam boxPadding 10
+
+actor "Project Manager / Developer" as User
+participant "🎨 Frontend (React + Vite)" as FE
+participant "☕ API Gateway (Spring Boot)" as Gateway
+participant "🐍 AI Service (FastAPI)" as AI
+participant "🤖 AI Requirement & Task Agent" as Agent
+database "🗄️ Database (SQLite)" as DB
+
+box "Người dùng & Frontend" #f8fafc
+    actor User
+    participant FE
+end box
+
+box "Backend Microservices" #f1f5f9
+    participant Gateway
+    participant AI
+    participant Agent
+    participant DB
+end box
+
+title **LUỒNG PHÂN TÍCH YÊU CẦU & PHÂN RÃ TASK BẰNG AI (REQUIREMENT ANALYSIS FLOW)**
+
+User -> FE : 1. Nhập văn bản Yêu cầu / User Story\nvà nhấn "🔍 Phân tích AI" hoặc "⚡ Phân rã Task"
+activate FE
+
+FE -> Gateway : 2. HTTP POST /api/ai/analyze (Bearer JWT)
+activate Gateway
+
+Gateway -> Gateway : 3. Xác thực JWT & Kiểm tra quyền RBAC (pm / dev)
+
+Gateway -> AI : 4. Forward REST Request đến AI Microservice (Port 8000)
+activate AI
+
+AI -> Agent : 5. Trích xuất Text & Gửi Prompt đến Requirement/Task Agent
+activate Agent
+
+Agent -> Agent : 6. Phân tích ngữ nghĩa, đánh giá phạm vi thi công,\nước lượng Story Points (Fibonacci) & sinh Acceptance Criteria
+
+Agent --> AI : 7. Trả về Kết quả JSON Cấu trúc (Structured Output)
+deactivate Agent
+
+AI -> DB : 8. Ghi nhật ký tác vụ vào bảng `aijob` (Audit Trail)
+activate DB
+DB --> AI : 9. Xử lý lưu thành công
+deactivate DB
+
+AI --> Gateway : 10. Trả về kết quả JSON Response
+deactivate AI
+
+Gateway --> FE : 11. Trả về kết quả API Response (200 OK)
+deactivate Gateway
+
+FE -> FE : 12. Hiển thị Hộp thoại (Modal) Phân tích Chi tiết / Ước lượng SP
+
+alt Người dùng chấp nhận gợi ý của AI
+    User -> FE : 13. Nhấn "✅ Áp dụng Yêu cầu / Cập nhật Task"
+    FE -> Gateway : 14. POST/PUT lưu User Story & Tasks mới vào DB
+    Gateway -> DB : 15. Lưu thông tin User Story & Tasks
+    DB --> Gateway : 16. Xác nhận lưu
+    Gateway --> FE : 17. Trả về thông báo thành công
+    FE -> User : 18. Hiển thị Toast "Đã áp dụng kết quả AI thành công!"
+else Người dùng bỏ qua
+    User -> FE : 19. Nhấn "Đóng / Hủy"
+end
+
+deactivate FE
+
+@enduml

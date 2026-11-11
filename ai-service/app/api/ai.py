@@ -1,25 +1,40 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import desc
 from sqlmodel import Session, select
 
 from ..core.dependencies import require_permission
 from ..db import get_session
-from ..models import AIAgent, AIJob, Task
+from ..models import (
+    AIAgent,
+    AIJob,
+    AgentActionRecord,
+    AgentDeliberation,
+    AgentThought,
+    DeliberationResolution,
+    Task,
+)
 from ..schemas import (
     AIAgentRead,
     AIJobRead,
+    AgentActionExecuteRequest,
+    AgentActionRecordRead,
+    AgentRollbackRequest,
     AnalyzeRequest,
     AssignRequest,
     BreakdownRequest,
+    DeliberateRequest,
+    DeliberationRead,
+    DeliberationResponse,
     DocumentationRequest,
     ForecastRequest,
+    ResolveHITLRequest,
     ReviewRequest,
     RiskCreate,
     RiskDetectRequest,
     StoryPointRequest,
     TaskUpdate,
 )
-from ..services import ai_service, crud
+from ..services import agent_runtime, ai_service, crud, orchestration_service
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
@@ -113,3 +128,159 @@ async def review(req: ReviewRequest, session: Session = Depends(get_session), us
 @router.post("/documentation")
 async def documentation(req: DocumentationRequest, session: Session = Depends(get_session), user=Depends(require_permission("ai:use"))):
     return await ai_service.generate_documentation(session, req.topic, user.id, req.project_id)
+
+
+# ==============================================================================
+# AUTONOMOUS MULTI-AGENT DELIBERATION & CONFLICT RESOLUTION ENDPOINTS
+# ==============================================================================
+@router.post("/deliberate", response_model=DeliberationResponse)
+async def deliberate(
+    req: DeliberateRequest,
+    session: Session = Depends(get_session),
+    user=Depends(require_permission("ai:use")),
+):
+    """
+    Coordinates 3 Autonomous Reasoning Agents (PO, Tech Lead, Scrum Master),
+    detects conflicts in scope, effort, and risk, and formulates a consensus compromise.
+    """
+    return await orchestration_service.execute_multi_agent_deliberation(
+        session=session,
+        user_story=req.user_story,
+        project_id=req.project_id,
+        sprint_id=req.sprint_id,
+        acceptance_criteria=req.acceptance_criteria,
+        context=req.context,
+        user_id=user.id,
+    )
+
+
+@router.post("/deliberate/{deliberation_id}/resolve-hitl")
+def resolve_hitl(
+    deliberation_id: int,
+    req: ResolveHITLRequest,
+    session: Session = Depends(get_session),
+    user=Depends(require_permission("ai:use")),
+):
+    """Applies a human PM decision to resolve a severe deliberation conflict (HITL protocol)."""
+    try:
+        return orchestration_service.resolve_hitl_decision(
+            session=session,
+            deliberation_id=deliberation_id,
+            selected_option=req.selected_option,
+            custom_notes=req.custom_notes,
+            user_id=user.id,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/deliberations", response_model=list[DeliberationRead])
+def list_deliberations(
+    project_id: int | None = None,
+    session: Session = Depends(get_session),
+    user=Depends(require_permission("ai:use")),
+):
+    """Retrieves recent multi-agent deliberation sessions."""
+    stmt = select(AgentDeliberation)
+    if project_id:
+        stmt = stmt.where(AgentDeliberation.project_id == project_id)
+    stmt = stmt.order_by(desc(AgentDeliberation.created_at)).limit(30)
+    return session.exec(stmt).all()
+
+
+@router.get("/deliberations/{deliberation_id}")
+def get_deliberation(
+    deliberation_id: int,
+    session: Session = Depends(get_session),
+    user=Depends(require_permission("ai:use")),
+):
+    """Retrieves full deliberation details, including thoughts of each autonomous agent."""
+    delib = session.get(AgentDeliberation, deliberation_id)
+    if not delib:
+        raise HTTPException(status_code=404, detail="Deliberation not found")
+    
+    thoughts = session.exec(
+        select(AgentThought).where(AgentThought.deliberation_id == deliberation_id)
+    ).all()
+    
+    resolutions = session.exec(
+        select(DeliberationResolution).where(DeliberationResolution.deliberation_id == deliberation_id)
+    ).all()
+
+    return {
+        "deliberation": delib,
+        "thoughts": thoughts,
+        "resolutions": resolutions,
+    }
+
+
+# ==============================================================================
+# AUTONOMOUS AGENT ACTIONS EXECUTION & ROLLBACK ENDPOINTS (HITL / HOOL Protocols)
+# ==============================================================================
+@router.get("/actions", response_model=list[AgentActionRecordRead])
+def list_agent_actions(
+    project_id: int | None = None,
+    agent_type: str | None = None,
+    status: str | None = None,
+    session: Session = Depends(get_session),
+    user=Depends(require_permission("ai:use")),
+):
+    """Lists recent autonomous actions proposed or executed by AI Agents."""
+    stmt = select(AgentActionRecord)
+    if project_id:
+        stmt = stmt.where(AgentActionRecord.project_id == project_id)
+    if agent_type:
+        stmt = stmt.where(AgentActionRecord.agent_type == agent_type)
+    if status:
+        stmt = stmt.where(AgentActionRecord.status == status)
+    stmt = stmt.order_by(desc(AgentActionRecord.created_at)).limit(50)
+    return session.exec(stmt).all()
+
+
+@router.post("/actions/{action_id}/execute")
+def execute_agent_action(
+    action_id: int,
+    req: AgentActionExecuteRequest | None = None,
+    session: Session = Depends(get_session),
+    user=Depends(require_permission("ai:use")),
+):
+    """
+    Executes a proposed autonomous action (HITL Approval protocol).
+    Commits proposed items (e.g. Subtasks, Assignments, Points) directly to the database.
+    """
+    try:
+        custom_notes = req.custom_notes if req else None
+        return agent_runtime.execute_autonomous_action(
+            session=session,
+            action_record_id=action_id,
+            user_id=user.id,
+            custom_notes=custom_notes,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi khi thực thi hành động Agent: {str(e)}")
+
+
+@router.post("/actions/{action_id}/rollback")
+def rollback_agent_action(
+    action_id: int,
+    session: Session = Depends(get_session),
+    user=Depends(require_permission("ai:use")),
+):
+    """
+    Rolls back an executed action using its snapshot (HOOL Rollback protocol).
+    Safely undoes created tasks, assignments, or risks.
+    """
+    try:
+        return agent_runtime.rollback_autonomous_action(
+            session=session,
+            action_record_id=action_id,
+            user_id=user.id,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi khi hoàn tác hành động Agent: {str(e)}")
+
+

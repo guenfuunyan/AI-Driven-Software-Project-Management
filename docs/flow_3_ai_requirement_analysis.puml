@@ -1,0 +1,91 @@
+@startuml Flow_3_AI_Requirement_Analysis
+!theme plain
+autonumber
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam shadow false
+skinparam boxPadding 10
+
+actor "Project Manager (PM)" as PM
+participant "🎨 Frontend (StoriesPage UI)" as FE
+participant "☕ API Gateway (Spring Boot)" as Gateway
+participant "🐍 AI Microservice (FastAPI)" as AI
+participant "🔍 AI Requirement Agent" as Agent
+database "🗄️ Database (SQLite)" as DB
+
+box "Client Side (Trình duyệt)" #f8fafc
+    actor PM
+    participant FE
+end box
+
+box "AI & Persistence Server Side" #f1f5f9
+    participant Gateway
+    participant AI
+    participant Agent
+    participant DB
+end box
+
+title **LUỒNG 3: PHÂN TÍCH & LÀM RÕ YÊU CẦU BẰNG AI (AI REQUIREMENT ANALYSIS FLOW)**
+
+' === STEP 1: INPUT DRAFT REQUIREMENT ===
+== 1. Gửi Yêu cầu & Kích hoạt AI Agent ==
+
+PM -> FE : 1. Nhập văn bản Yêu cầu / User Story sơ bộ\nvà nhấn "🔍 Phân tích AI"
+activate FE
+
+FE -> Gateway : 2. POST /api/ai/analyze (Bearer JWTToken, text)
+activate Gateway
+
+Gateway -> Gateway : 3. Kiểm tra JWT Token Signature & Quyền `canManageStories`
+
+Gateway -> AI : 4. Forward REST Payload đến AI Microservice (Port 8000)
+activate AI
+
+' === STEP 2: AGENT ANALYZING ===
+== 2. AI Agent Xử lý Semantics & Đánh giá Tiêu chí ==
+
+AI -> Agent : 5. Gửi Prompt & Text đến Requirement Agent
+activate Agent
+
+Agent -> Agent : 6. Trích xuất Mục tiêu, Vai trò (Role),\nPhạm vi Tính năng & Đánh giá Rủi ro Kỹ thuật
+
+Agent -> Agent : 7. Sinh Tiêu chí Chấp nhận (Acceptance Criteria)\ntheo chuẩn Given-When-Then
+
+Agent --> AI : 8. Trả về Kết quả JSON Cấu trúc (Structured Output)
+deactivate Agent
+
+AI -> DB : 9. Thêm bản ghi Audit Log vào bảng `aijob` (status = 'completed')
+activate DB
+DB --> AI : 10. Ghi log thành công
+deactivate DB
+
+AI --> Gateway : 11. Response JSON: { analysis_summary, feasibility_score, acceptance_criteria }
+deactivate AI
+
+Gateway --> FE : 12. HTTP 200 OK với Payload Phân tích
+deactivate Gateway
+
+' === STEP 3: MODAL DISPLAY & APPLICATION ===
+== 3. Duyệt Kết quả & Lưu vào Agile Backlog ==
+
+FE -> FE : 13. Mở Hộp thoại (Modal) "Phân tích Chi tiết Yêu cầu AI"\nHiển thị Tóm tắt, Độ khả thi & Acceptance Criteria
+
+alt PM chấp nhận kết quả AI
+    PM -> FE : 14. Nhấn "✅ Áp dụng & Thêm vào Backlog"
+    FE -> Gateway : 15. POST /api/stories (sprint_id, title, description, criteria)
+    activate Gateway
+    Gateway -> DB : 16. INSERT User Story mới vào bảng `userstory`
+    activate DB
+    DB --> Gateway : 17. Xác nhận lưu
+    deactivate DB
+    Gateway --> FE : 18. Response 201 Created
+    deactivate Gateway
+    FE --> PM : 19. Đóng Modal & Hiển thị Toast "Đã thêm User Story từ AI!"
+else PM Hủy kết quả
+    PM -> FE : 20. Nhấn "Bỏ qua / Hủy"
+    FE --> PM : 21. Đóng Modal không lưu dữ liệu
+end
+
+deactivate FE
+
+@enduml

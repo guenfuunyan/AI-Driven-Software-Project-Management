@@ -1,0 +1,129 @@
+@startuml AI_Project_Management_UseCase_Diagram
+!theme plain
+top to bottom direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam actor {
+    BackgroundColor #3b82f6
+    BorderColor #1d4ed8
+    FontColor #ffffff
+}
+skinparam usecase {
+    BackgroundColor #ffffff
+    BorderColor #64748b
+    ArrowColor #475569
+}
+
+title **MÔ HÌNH USE CASE TỔNG THỂ HỆ THỐNG QUẢN LÝ DỰ ÁN HƯỚNG AI (AI-DRIVEN PMS)**
+
+' ==========================================
+' ACTORS
+' ==========================================
+actor "Quản trị viên\n(Admin)" as Admin
+actor "Quản lý Dự án\n(Project Manager)" as PM
+actor "Lập trình viên\n(Developer)" as Dev
+actor "Người xem\n(Viewer)" as Viewer
+
+actor "Hệ thống AI Agents\n(Multi-Agent Suite)" as AIAgent << System >>
+
+' Actor Inheritance (Kế thừa quyền hạn)
+Viewer <|-- Dev
+Dev <|-- PM
+PM <|-- Admin
+
+' ==========================================
+' SYSTEM BOUNDARY & USE CASES
+' ==========================================
+rectangle "Hệ thống Quản lý Dự án Hướng AI (AI-Driven PMS)" {
+
+    ' --- Subsystem: Auth & Security ---
+    package "Xác thực & Quản trị Hệ thống" {
+        usecase "UC01: Đăng nhập Hệ thống (JWT)" as UC_Login
+        usecase "UC02: Cập nhật Hồ sơ Cá nhân" as UC_Profile
+        usecase "UC03: Quản lý Người dùng & RBAC" as UC_Users
+    }
+
+    ' --- Subsystem: Project & Agile Backlog ---
+    package "Quản lý Dự án & Agile Backlog" {
+        usecase "UC04: Quản lý Dự án (Projects)" as UC_Project
+        usecase "UC05: Quản lý Sprint (Sprints)" as UC_Sprint
+        usecase "UC06: Quản lý User Stories" as UC_Story
+        usecase "UC07: Quản lý Công việc (Tasks)" as UC_Task
+    }
+
+    ' --- Subsystem: AI Multi-Agent Assistance ---
+    package "Trợ lý AI Đa Agent (Multi-Agent Suite)" {
+        usecase "UC08: AI Phân tích Yêu cầu" as UC_AI_Analyze
+        usecase "UC09: AI Ước lượng Story Points" as UC_AI_SP
+        usecase "UC10: AI Phân rã Tasks" as UC_AI_Breakdown
+        usecase "UC11: AI Phát hiện Rủi ro" as UC_AI_Risk
+        usecase "UC12: AI Dự báo Tiến độ (ANN Engine)" as UC_AI_Forecast
+        usecase "UC13: AI Tự động Phân công Task" as UC_AI_Assign
+    }
+
+    ' --- Subsystem: DevOps Governance ---
+    package "Điều phối DevOps & AI Execution" {
+        usecase "UC14: Mô phỏng AI DevOps Sandbox" as UC_DevOps_Sandbox
+        usecase "UC15: Phê duyệt Thủ công (HITL Mode)" as UC_HITL
+        usecase "UC16: Giám sát & Can thiệp (HOTL Mode)" as UC_HOTL
+        usecase "UC17: Tự động & Hoàn tác (HOOL Mode)" as UC_HOOL
+    }
+
+    ' --- Subsystem: Analytics & Dashboard ---
+    package "Báo cáo & Theo dõi Tiến độ" {
+        usecase "UC18: Xem Bảng điều khiển KPI" as UC_Dashboard
+        usecase "UC19: Xem Biểu đồ Burndown & Velocity" as UC_Reports
+        usecase "UC20: Xem Nhật ký Tác vụ AI (Audit Trail)" as UC_AILog
+    }
+}
+
+' ==========================================
+' RELATIONSHIPS & ASSOCIATIONS
+' ==========================================
+
+' Viewer (Quyền cơ bản)
+Viewer --> UC_Login
+Viewer --> UC_Profile
+Viewer --> UC_Dashboard
+Viewer --> UC_Reports
+
+' Developer (Quyền thực thi & thao tác Task)
+Dev --> UC_Task
+Dev --> UC_DevOps_Sandbox
+Dev --> UC_AI_Breakdown
+
+' Project Manager (Quyền quản lý Backlog & AI)
+PM --> UC_Project
+PM --> UC_Sprint
+PM --> UC_Story
+PM --> UC_AI_Analyze
+PM --> UC_AI_SP
+PM --> UC_AI_Risk
+PM --> UC_AI_Forecast
+PM --> UC_AI_Assign
+
+' Admin (Quyền tối cao)
+Admin --> UC_Users
+Admin --> UC_AILog
+
+' Secondary Actor Connections (AI Agents)
+AIAgent --> UC_AI_Analyze
+AIAgent --> UC_AI_SP
+AIAgent --> UC_AI_Breakdown
+AIAgent --> UC_AI_Risk
+AIAgent --> UC_AI_Forecast
+AIAgent --> UC_AI_Assign
+AIAgent --> UC_DevOps_Sandbox
+
+' Include & Extend Relationships
+UC_DevOps_Sandbox <.. UC_HITL : << extend >>
+UC_DevOps_Sandbox <.. UC_HOTL : << extend >>
+UC_DevOps_Sandbox <.. UC_HOOL : << extend >>
+
+UC_AI_SP .> UC_Story : << include >>
+UC_AI_Breakdown .> UC_Story : << include >>
+UC_AI_Risk .> UC_Task : << include >>
+
+@enduml

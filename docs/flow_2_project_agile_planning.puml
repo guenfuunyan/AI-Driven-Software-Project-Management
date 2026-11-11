@@ -1,0 +1,115 @@
+@startuml Flow_2_Project_Agile_Planning
+!theme plain
+autonumber
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam shadow false
+skinparam boxPadding 10
+
+actor "Project Manager (PM)" as PM
+participant "🎨 Frontend (Projects / Backlog UI)" as FE
+participant "☕ API Gateway (Spring Boot)" as Gateway
+participant "🐍 CRUD Service (FastAPI)" as Service
+database "🗄️ Database (SQLite)" as DB
+
+box "Người dùng & Frontend" #f8fafc
+    actor PM
+    participant FE
+end box
+
+box "Backend & Core Persistence" #f1f5f9
+    participant Gateway
+    participant Service
+    participant DB
+end box
+
+title **LUỒNG 2: QUẢN LÝ DỰ ÁN & KẾ HOẠCH AGILE (PROJECT & AGILE BACKLOG PLANNING FLOW)**
+
+' === STEP 1: CREATE / UPDATE PROJECT ===
+== 1. Khởi tạo & Cấu hình Dự án (Project Setup) ==
+
+PM -> FE : 1. Chọn "+ Dự án mới" / "Sửa Dự án"\nvà nhập Tên, Mô tả, Trạng thái
+activate FE
+
+FE -> Gateway : 2. POST /api/projects hoặc PUT /api/projects/{id}\n(Headers: Bearer JWT Token)
+activate Gateway
+
+Gateway -> Gateway : 3. Xác thực JWT & Kiểm tra quyền `canManageProjects` (PM / Admin)
+
+Gateway -> Service : 4. Forward Request đến CRUD Service
+activate Service
+
+Service -> DB : 5. INSERT / UPDATE dữ liệu vào bảng `project`
+activate DB
+DB --> Service : 6. Trả về thông tin Project đã tạo/cập nhật
+deactivate DB
+
+Service --> Gateway : 7. Trả về JSON Result (201 Created / 200 OK)
+deactivate Service
+
+Gateway --> FE : 8. Response 200 OK với thông tin Dự án
+deactivate Gateway
+
+FE --> PM : 9. Hiển thị Card Dự án mới & Toast "Đã lưu thông tin Dự án!"
+
+' === STEP 2: CREATE SPRINT ===
+== 2. Lập Kế hoạch Sprint (Sprint Planning) ==
+
+PM -> FE : 10. Chuyển sang Bảng Sprint & Chọn "+ Sprint Mới"\n(Tên Sprint, Mục tiêu, Ngày bắt đầu - Kết thúc)
+
+FE -> Gateway : 11. POST /api/sprints (project_id, name, goal, dates)
+activate Gateway
+
+Gateway -> Service : 12. Xử lý logic tạo Sprint mới
+activate Service
+
+Service -> DB : 13. INSERT vào bảng `sprint` (status = 'active' / 'planned')
+activate DB
+DB --> Service : 14. Trả về thông tin Sprint
+deactivate DB
+
+Service --> Gateway : 15. JSON Response thành công
+deactivate Service
+
+Gateway --> FE : 16. Response 200 OK
+deactivate Gateway
+
+FE --> PM : 17. Hiển thị Cột/Tab Sprint mới trên Bảng tiến độ
+
+' === STEP 3: MANAGE USER STORIES & TASKS ===
+== 3. Quản lý User Stories & Phân rã Backlog Tasks ==
+
+PM -> FE : 18. Thêm User Story mới (Tiêu đề, Acceptance Criteria)
+FE -> Gateway : 19. POST /api/stories (sprint_id, title, criteria)
+activate Gateway
+Gateway -> DB : 20. INSERT vào bảng `userstory`
+activate DB
+DB --> Gateway : 21. Lưu thành công
+deactivate DB
+Gateway --> FE : 22. Cập nhật Danh sách User Stories
+deactivate Gateway
+
+PM -> FE : 23. Tạo các Task kỹ thuật thuộc Story & Phân công Assignee
+FE -> Gateway : 24. POST /api/tasks (title, story_points, assignee_id, sprint_id)
+activate Gateway
+
+Gateway -> Service : 25. Lưu Task mới & Tính lại tổng Story Points của Sprint
+activate Service
+
+Service -> DB : 26. INSERT vào bảng `task`
+activate DB
+DB --> Service : 27. Trả về Task đã lưu
+deactivate DB
+
+Service --> Gateway : 28. Response 200 OK
+deactivate Service
+
+Gateway --> FE : 29. Trả về Task thông tin mới
+deactivate Gateway
+
+FE -> FE : 30. Cập nhật thẻ Task trên Bảng Kanban\nvà thanh Tiến độ % hoàn thành của Sprint
+
+FE --> PM : 31. Hiển thị Backlog đã sẵn sàng cho Sprint Execution
+deactivate FE
+
+@enduml

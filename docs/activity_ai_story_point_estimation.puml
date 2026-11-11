@@ -1,0 +1,88 @@
+@startuml Activity_AI_Story_Point_Estimation
+!theme plain
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam shadow false
+skinparam ActivityBackgroundColor #ffffff
+skinparam ActivityBorderColor #3b82f6
+skinparam ActivityDiamondBackgroundColor #ffffff
+skinparam ActivityDiamondBorderColor #f59e0b
+
+title **SƠ ĐỒ HOẠT ĐỘNG (ACTIVITY DIAGRAM) - ƯỚC LƯỢNG STORY POINTS BẰNG AI**
+
+|#f8fafc|Người dùng (PM / Developer)|
+start
+:1. Chọn câu chuyện người dùng (User Story) cần ước lượng;
+:2. Nhấn nút "🎯 Ước lượng SP bằng AI";
+
+|#f1f5f9|Frontend UI (React App)|
+:3. Kiểm tra thông tin User Story (ID & mô tả);
+
+if (Chưa chọn Story hoặc Mô tả rỗng?) then (Có)
+    :Hiển thị thông báo "Vui lòng chọn User Story hợp lệ";
+    end
+else (Không)
+    :4. Gửi HTTP POST /api/ai/story-point (kèm JWT Token);
+endif
+
+|#e2e8f0|Backend API & AI Microservice|
+:5. Xác thực JWT Token & Kiểm tra Quyền RBAC;
+
+if (Token Hợp lệ?) then (Không)
+    :Trả về Lỗi 401/403 (Unauthorized / Forbidden);
+    |#f1f5f9|Frontend UI (React App)|
+    :Hiển thị thông báo lỗi phân quyền;
+    end
+else (Có)
+    |#e2e8f0|Backend API & AI Microservice|
+    :6. Chuyển tiếp Request đến Planning Agent;
+    
+    |#dbeafe|Planning Agent (Story Point Estimator)|
+    :7. Trích xuất văn bản User Story & Phân tích các yếu tố độ phức tạp;
+    
+    fork
+        :8a. Đánh giá Độ phức tạp Thuật toán & Xử lý Dữ liệu;
+    fork again
+        :8b. Đánh giá Số lượng Giao diện UI & Tương tác;
+    fork again
+        :8c. Đánh giá Tích hợp Cơ sở dữ liệu & Third-party API;
+    end fork
+
+    :9. Quy đổi tổng độ phức tạp sang Thang điểm Fibonacci\n(1, 2, 3, 5, 8, 13, 21 SP) dựa trên Logic Mờ (Fuzzy Logic);
+    :10. Tạo phần Lý giải (Reasoning) cho mức điểm ước lượng;
+
+    |#e2e8f0|Backend API & AI Microservice|
+    :11. Thêm bản ghi Audit Log vào Bảng `aijob` trong DB;
+    :12. Trả về JSON Response { estimated_sp, reasoning } (200 OK);
+
+    |#f1f5f9|Frontend UI (React App)|
+    :13. Hiển thị Hộp thoại Modal "🎯 Ước lượng Story Points bằng AI";
+    :14. Render Badge điểm SP đề xuất, Đoạn Lý giải & Bộ nút Fibonacci chọn nhanh (1 - 21);
+
+    |#f8fafc|Người dùng (PM / Developer)|
+    :15. Xem xét điểm gợi ý & có thể điều chỉnh nút Fibonacci nếu cần;
+
+    if (Người dùng Chấp nhận / Xác nhận Mức điểm?) then (Có - Áp dụng)
+        :16. Nhấn nút "✅ Áp dụng Story Point";
+        
+        |#f1f5f9|Frontend UI (React App)|
+        :17. Gửi PUT /api/stories/{id} (story_points) cập nhật DB;
+        
+        |#e2e8f0|Backend API & AI Microservice|
+        :18. UPDATE giá trị `story_points` trong Bảng `userstory`;
+        
+        |#f1f5f9|Frontend UI (React App)|
+        :19. Hiển thị Toast "Đã cập nhật Story Points thành công!";
+        :20. Cập nhật Badge điểm SP mới trên Thẻ User Story UI;
+    else (Không - Bỏ qua)
+        |#f8fafc|Người dùng (PM / Developer)|
+        :21. Nhấn "Đóng / Hủy";
+        
+        |#f1f5f9|Frontend UI (React App)|
+        :22. Đóng Modal không thay đổi điểm SP cũ;
+    endif
+endif
+
+stop
+
+@enduml

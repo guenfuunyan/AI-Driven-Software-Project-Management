@@ -42,3 +42,16 @@ def update_risk(
     if not risk or risk.deleted_at:
         raise HTTPException(status_code=404, detail="Risk not found")
     return crud.update_risk(session, risk, data)
+
+
+@router.delete("/{risk_id}")
+def delete_risk(
+    risk_id: int,
+    session: Session = Depends(get_session),
+    user=Depends(require_permission("risk:write")),
+):
+    risk = session.get(Risk, risk_id)
+    if not risk or risk.deleted_at:
+        raise HTTPException(status_code=404, detail="Risk not found")
+    crud.delete_risk(session, risk)
+    return {"message": "Risk deleted successfully"}

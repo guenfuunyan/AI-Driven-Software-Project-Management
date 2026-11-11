@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMe, login } from '../api/client';
 import { useAuthStore } from '../store/auth';
@@ -8,8 +8,15 @@ export default function LoginPage() {
   const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const token = useAuthStore((s) => s.token);
   const setAuth = useAuthStore((s) => s.setAuth);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (token) {
+      navigate('/', { replace: true });
+    }
+  }, [token, navigate]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -19,9 +26,11 @@ export default function LoginPage() {
       const tokens = await login(username, password);
       const user = await getMe(tokens.access_token);
       setAuth(tokens.access_token, tokens.refresh_token, user);
-      navigate('/');
-    } catch {
-      setError('Sai tên đăng nhập hoặc mật khẩu');
+      navigate('/', { replace: true });
+    } catch (err: any) {
+      console.error('Lỗi khi đăng nhập:', err);
+      const msg = err?.response?.data?.detail || err?.message || 'Sai tên đăng nhập hoặc mật khẩu';
+      setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
     } finally {
       setLoading(false);
     }

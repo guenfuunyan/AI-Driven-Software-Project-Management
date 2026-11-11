@@ -1,0 +1,85 @@
+@startuml Sequence_AI_Sprint_Forecast
+!theme plain
+autonumber
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam shadow false
+skinparam boxPadding 10
+
+actor "User (PM / Viewer)" as User
+participant "🎨 Frontend UI (ForecastPage.tsx)" as FE
+participant "☕ API Gateway (Spring Security)" as Gateway
+participant "🐍 AI Microservice (FastAPI)" as AI
+participant "📈 Forecast Agent (ANN Engine)" as Agent
+database "🗄️ Database (SQLite)" as DB
+
+box "Client Side (Trình duyệt)" #f8fafc
+    actor User
+    participant FE
+end box
+
+box "Server Side & Neural Analytics" #f1f5f9
+    participant Gateway
+    participant AI
+    participant Agent
+    participant DB
+end box
+
+title **SEQUENCE DIAGRAM - QUY TRÌNH DỰ BÁO TIẾN ĐỘ SPRINT BẰNG MẠNG NƠ-RON (ANN FORECAST)**
+
+' === STEP 1: UI LOAD & REQUEST ===
+User -> FE : 1. Truy cập Trang "Dự báo" (/forecast)\nvà chọn Dự án (Project ID)
+activate FE
+
+FE -> Gateway : 2. HTTP GET /api/forecasts/projects/{project_id}\nHeader: Authorization: Bearer <JWT Token>
+activate Gateway
+
+Gateway -> Gateway : 3. Xác thực JWT Token Signature & Quyền `report:read`
+
+Gateway -> AI : 4. Forward REST Request đến AI Microservice (Port 8000)
+activate AI
+
+' === STEP 2: DATA RETRIEVAL ===
+AI -> DB : 5. Query danh sách Sprint & Tasks thuộc Project ID
+activate DB
+DB --> AI : 6. Trả về Danh sách Tasks (status, story_points, updated_at)
+deactivate DB
+
+AI -> AI : 7. Tính toán các chỉ số hiện tại:\n- Tổng Story Points đã hoàn thành (done_points)\n- Tổng Story Points còn tồn đọng (remaining_points)\n- Số ngày đã trôi qua trong Sprint (days_elapsed)
+
+' === STEP 3: ANN NEURAL ENGINE PROCESSING ===
+AI -> Agent : 8. Truyền dữ liệu tiến độ sang Forecast Agent (ANN Engine)
+activate Agent
+
+Agent -> Agent : 9. Phân tích mẫu chuỗi thời gian (Time-series Pattern)\nvà ma trận phụ thuộc phi tuyến giữa các Tasks
+
+Agent -> Agent : 10. Tính toán Tốc độ dự kiến: predicted_velocity = done / max(days_elapsed, 1)
+
+Agent -> Agent : 11. Đánh giá Xác suất Hoàn thành Sprint (completion_probability 0-100%)\nvà Dự báo Ngày đóng Sprint khả thi
+
+Agent -> Agent : 12. Generates Ghi chú Burndown (burndown_notes) & Cảnh báo điểm nghẽn
+
+Agent --> AI : 13. Trả về Kết quả JSON Cấu trúc:\n{ predicted_velocity, remaining_story_points, completion_probability, burndown_notes }
+deactivate Agent
+
+' === STEP 4: PERSISTENCE & AUDIT LOG ===
+AI -> DB : 14. INSERT bản ghi vào Bảng `forecast` (forecast_type = 'velocity')\nvà INSERT vào Bảng `aijob` (job_type = 'forecast', status = 'completed')
+activate DB
+DB --> AI : 15. Ghi dữ liệu forecast & audit log thành công
+deactivate DB
+
+AI --> Gateway : 16. Response HTTP 200 OK với JSON Result
+deactivate AI
+
+Gateway --> FE : 17. Forward HTTP 200 OK Response về Frontend
+deactivate Gateway
+
+' === STEP 5: UI RECHARTS RENDERING ===
+FE -> FE : 18. Khởi tạo Biểu đồ Recharts AreaChart (Burndown lý thuyết vs thực tế)\nvà Biểu đồ Cột Velocity
+
+FE -> FE : 19. Render Thẻ KPI Mạng Nơ-ron ANN (Predicted Velocity, Probability Badge,\nBurndown Notes Alert Banner)
+
+FE --> User : 20. Hiển thị Giao diện Dự báo Tiến độ trực quan & thời gian thực
+deactivate FE
+
+@enduml

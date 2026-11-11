@@ -1,0 +1,87 @@
+@startuml Activity_AI_Requirement_Analysis
+!theme plain
+skinparam fontName "Segoe UI"
+skinparam fontSize 12
+skinparam shadow false
+skinparam ActivityBackgroundColor #ffffff
+skinparam ActivityBorderColor #3b82f6
+skinparam ActivityDiamondBackgroundColor #ffffff
+skinparam ActivityDiamondBorderColor #f59e0b
+
+title **SƠ ĐỒ HOẠT ĐỘNG (ACTIVITY DIAGRAM) - PHÂN TÍCH YÊU CẦU BẰNG AI**
+
+|#f8fafc|Người dùng (PM / Developer)|
+start
+:1. Nhập văn bản Yêu cầu / User Story sơ bộ;
+:2. Nhấn nút "🔍 Phân tích AI";
+
+|#f1f5f9|Frontend UI (React App)|
+:3. Kiểm tra tính hợp lệ của văn bản nhập;
+
+if (Văn bản rỗng?) then (Có)
+    :Hiển thị thông báo "Vui lòng nhập nội dung yêu cầu";
+    end
+else (Không)
+    :4. Gửi HTTP POST /api/ai/analyze (kèm JWT Token);
+endif
+
+|#e2e8f0|Backend API & AI Microservice|
+:5. Xác thực JWT Token & Phân quyền RBAC;
+
+if (Hợp lệ & Đủ quyền?) then (Không)
+    :Trả về Lỗi 401/403 (Unauthorized / Forbidden);
+    |#f1f5f9|Frontend UI (React App)|
+    :Hiển thị thông báo lỗi phân quyền;
+    end
+else (Có)
+    |#e2e8f0|Backend API & AI Microservice|
+    :6. Chuyển tiếp Request đến AI Requirement Agent;
+    
+    |#dbeafe|AI Requirement Agent|
+    :7. Làm sạch Prompt & Trích xuất ngữ nghĩa;
+    
+    fork
+        :8a. Đánh giá Điểm Khả thi (Feasibility Score);
+    fork again
+        :8b. Phát hiện Rủi ro & Điểm nghẽn kỹ thuật;
+    fork again
+        :8c. Sinh Tiêu chí Chấp nhận (Acceptance Criteria\ntheo Given-When-Then);
+    end fork
+
+    :9. Tổng hợp Kết quả JSON Cấu trúc (Structured Output);
+
+    |#e2e8f0|Backend API & AI Microservice|
+    :10. Ghi Nhật ký Tác vụ vào Bảng `aijob` trong DB;
+    :11. Trả về JSON Response (200 OK);
+
+    |#f1f5f9|Frontend UI (React App)|
+    :12. Hiển thị Hộp thoại Modal "Phân tích Chi tiết Yêu cầu AI";
+    :13. Render Tóm tắt, Badge Độ khả thi & Danh sách Acceptance Criteria;
+
+    |#f8fafc|Người dùng (PM / Developer)|
+    :14. Xem xét & Quyết định hành động;
+
+    if (PM Chấp nhận Kết quả AI?) then (Có - Áp dụng)
+        :15. Nhấn nút "✅ Áp dụng & Thêm vào Backlog";
+        
+        |#f1f5f9|Frontend UI (React App)|
+        :16. Gửi POST /api/stories lưu User Story vào DB;
+        
+        |#e2e8f0|Backend API & AI Microservice|
+        :17. INSERT thông tin User Story vào Bảng `userstory`;
+        
+        |#f1f5f9|Frontend UI (React App)|
+        :18. Hiển thị Toast "Đã tạo User Story từ AI thành công!";
+        :19. Đóng Modal & Cập nhật Danh sách Stories UI;
+    else (Không - Bỏ qua)
+        |#f8fafc|Người dùng (PM / Developer)|
+        :20. Nhấn "Đóng / Hủy";
+        
+        |#f1f5f9|Frontend UI (React App)|
+        :21. Đóng Modal không lưu dữ liệu;
+    endif
+endif
+
+stop
+
+@enduml

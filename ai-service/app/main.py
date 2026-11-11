@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
 from .db import init_db
-from .api import ai
+from .api import ai, auth, projects, sprints, tasks, stories, risks, forecasts, dashboard
 
 settings = get_settings()
 
@@ -22,12 +22,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Only include AI routes
+# Include all API routes
 app.include_router(ai.router)
+app.include_router(auth.router)
+app.include_router(projects.router)
+app.include_router(sprints.router)
+app.include_router(tasks.router)
+app.include_router(stories.router)
+app.include_router(risks.router)
+app.include_router(forecasts.router)
+app.include_router(dashboard.router)
 
 @app.on_event("startup")
 def on_startup():
     init_db()
+    try:
+        from .seed import seed_database
+        seed_database()
+        print("Database initialized and seeded successfully.")
+    except Exception as e:
+        print(f"Seeding skipped or failed: {e}")
 
 @app.get("/health")
 def health():

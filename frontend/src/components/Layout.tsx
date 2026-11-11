@@ -3,16 +3,16 @@ import { useAuthStore } from '../store/auth';
 import { getPageAccess, getRoleLabel } from '../utils/roleAccess';
 
 const navigation = [
-  { to: '/', key: 'dashboard' as const, label: 'Dashboard' },
-  { to: '/projects', key: 'projects' as const, label: 'Projects' },
-  { to: '/sprint', key: 'sprint' as const, label: 'Sprint Board' },
-  { to: '/stories', key: 'stories' as const, label: 'User Stories' },
-  { to: '/tasks', key: 'tasks' as const, label: 'Tasks' },
-  { to: '/risks', key: 'risks' as const, label: 'Risks' },
-  { to: '/forecast', key: 'forecast' as const, label: 'Forecast' },
-  { to: '/ai', key: 'ai' as const, label: 'AI Agents' },
-  { to: '/reports', key: 'reports' as const, label: 'Reports' },
-  { to: '/settings', key: 'settings' as const, label: 'Settings' },
+  { to: '/', key: 'dashboard' as const, label: 'Bảng điều khiển' },
+  { to: '/projects', key: 'projects' as const, label: 'Dự án' },
+  { to: '/sprint', key: 'sprint' as const, label: 'Bảng Sprint' },
+  { to: '/stories', key: 'stories' as const, label: 'Yêu cầu' },
+  { to: '/tasks', key: 'tasks' as const, label: 'Công việc' },
+  { to: '/risks', key: 'risks' as const, label: 'Rủi ro' },
+  { to: '/forecast', key: 'forecast' as const, label: 'Dự báo' },
+  { to: '/ai', key: 'ai' as const, label: 'Trợ lý AI' },
+  { to: '/reports', key: 'reports' as const, label: 'Báo cáo' },
+  { to: '/settings', key: 'settings' as const, label: 'Cài đặt' },
 ];
 
 export default function Layout() {
@@ -46,7 +46,7 @@ export default function Layout() {
             {getRoleLabel(role)}
           </div>
           <button className="btn secondary" style={{ marginTop: '0.5rem', width: '100%' }} onClick={handleLogout}>
-            Logout
+            Đăng xuất
           </button>
         </div>
       </aside>

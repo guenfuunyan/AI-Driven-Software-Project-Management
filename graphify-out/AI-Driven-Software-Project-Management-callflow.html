@@ -1,0 +1,2698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Driven-Software-Project-Management — Complete Call Flow &amp; Architecture Documentation</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --border: #334155;
+  --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  --warn: #fbbf24; --err: #f87171; --ok: #34d399;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 2.4rem; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent), #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h2 { font-size: 1.7rem; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+h3 { font-size: 1.25rem; margin: 32px 0 12px; color: var(--accent); }
+h4 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--warn); }
+p { margin: 8px 0; color: var(--muted); }
+.subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 32px; }
+.mermaid { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 20px 0; overflow-x: auto; position: relative; }
+.mermaid.is-enhanced { padding: 0; overflow: hidden; min-height: 260px; }
+.mermaid-viewport { padding: 54px 24px 24px; overflow: hidden; cursor: grab; touch-action: none; min-height: 260px; }
+.mermaid-viewport.is-dragging { cursor: grabbing; }
+.mermaid-viewport svg { max-width: none !important; height: auto; transform-origin: 0 0; transition: transform 120ms ease; }
+.mermaid-toolbar { position: absolute; top: 10px; right: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; padding: 6px; background: rgba(15,23,42,0.92); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
+.mermaid-toolbar button, .mermaid-toolbar .zoom-level { height: 28px; min-width: 32px; border: 1px solid var(--border); border-radius: 6px; background: #1e293b; color: var(--text); font: 600 0.78rem system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; }
+.mermaid-toolbar button { cursor: pointer; }
+.mermaid-toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+.mermaid-toolbar .zoom-level { min-width: 52px; color: var(--muted); background: transparent; }
+.call-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+.call-table th { background: #1a2744; color: var(--accent); text-align: left; padding: 10px 14px; border: 1px solid var(--border); }
+.call-table td { padding: 8px 14px; border: 1px solid var(--border); vertical-align: top; }
+.call-table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.tag-async { background: #7c3aed33; color: #a78bfa; }
+.tag-class { background: #05966933; color: var(--ok); }
+.tag-func { background: #2563eb33; color: var(--accent); }
+.tag-cmd { background: #d9770633; color: var(--warn); }
+.tag-endpoint { background: #dc262633; color: var(--err); }
+.tag-hook { background: #db277733; color: #f472b6; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin: 16px 0; }
+.arrow-chain { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); padding: 10px; background: rgba(56,189,248,0.06); border-radius: 6px; }
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 3px; font-size: 0.88em; }
+ul, ol { margin: 8px 0 8px 24px; color: var(--muted); }
+li { margin: 4px 0; }
+a { color: var(--accent); }
+hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+.nav { position: sticky; top: 0; background: var(--bg); z-index: 10; padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.9rem; }
+.nav a { text-decoration: none; }
+.nav a:hover { text-decoration: underline; }
+@media (max-width: 768px) { .container { padding: 16px; } h1 { font-size: 1.8rem; } }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>AI-Driven-Software-Project-Management — Complete Call Flow &amp; Architecture Documentation</h1>
+<p class="subtitle">Generated from graphify knowledge graph: 778 nodes, 2057 edges, 38 communities. Commit: be51b54</p>
+
+<div class="nav">
+    <a href="#overview">Architecture Overview</a>
+    <a href="#extract-pipeline">Extraction Pipeline</a>
+    <a href="#build-graph">Graph Build</a>
+    <a href="#cli-skills">CLI &amp; Skill Installers</a>
+    <a href="#serve-api">Serving API</a>
+    <a href="#tests-fixtures">Tests &amp; Fixtures</a>
+    <a href="#maven-mvn-apache">Maven Mvn Apache</a>
+    <a href="#vite-envdts-frontend">Vite Envdts Frontend</a>
+    <a href="#service-prompts-librarypy">Service Prompts Librarypy</a>
+    <a href="#tailwindcss-tailwindconfigjs-frontend">Tailwindcss Tailwindconfigjs Frontend</a>
+    <a href="#mvndebug-maven-apache">Mvndebug Maven Apache</a>
+    <a href="#mvnyjp-maven-apache">Mvnyjp Maven Apache</a>
+    <a href="#service-app">Service App</a>
+    <a href="#app-service">App Service</a>
+    <a href="#prompts-service-app">Prompts Service App</a>
+    <a href="#other">Other</a>
+</div>
+
+<!-- ====== Architecture Overview ====== -->
+<h2 id="overview">1. Architecture Overview</h2>
+
+<div class="mermaid">
+
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    EXTRACT_PIPELINE_5F350230("Extraction Pipeline<br/><small>94 nodes</small>")
+    class EXTRACT_PIPELINE_5F350230 module;
+    BUILD_GRAPH_321CBB04("Graph Build<br/><small>156 nodes</small>")
+    class BUILD_GRAPH_321CBB04 module;
+    CLI_SKILLS_9964CBB8("CLI &amp; Skill Installers<br/><small>19 nodes</small>")
+    class CLI_SKILLS_9964CBB8 module;
+    SERVE_API_35EC8E86("Serving API<br/><small>374 nodes</small>")
+    class SERVE_API_35EC8E86 module;
+    TESTS_FIXTURES_B84B1DCC("Tests &amp; Fixtures<br/><small>113 nodes</small>")
+    class TESTS_FIXTURES_B84B1DCC module;
+    MAVEN_MVN_APACHE_D8BEB697("Maven Mvn Apache<br/><small>5 nodes</small>")
+    class MAVEN_MVN_APACHE_D8BEB697 module;
+    VITE_ENVDTS_FRONTEND_775FC3C1("Vite Envdts Frontend<br/><small>3 nodes</small>")
+    class VITE_ENVDTS_FRONTEND_775FC3C1 module;
+    SERVICE_PROMPTS_LIBRARYPY_4DFDB7A6("Service Prompts Librarypy<br/><small>2 nodes</small>")
+    class SERVICE_PROMPTS_LIBRARYPY_4DFDB7A6 module;
+    TAILWINDCSS_TAILWINDCONFIGJS_FRONTEND_AC97E34A("Tailwindcss Tailwindconfigjs Frontend<br/><small>2 nodes</small>")
+    class TAILWINDCSS_TAILWINDCONFIGJS_FRONTEND_AC97E34A module;
+    MVNDEBUG_MAVEN_APACHE_9F36B683("Mvndebug Maven Apache<br/><small>2 nodes</small>")
+    class MVNDEBUG_MAVEN_APACHE_9F36B683 module;
+    MVNYJP_MAVEN_APACHE_C448A710("Mvnyjp Maven Apache<br/><small>2 nodes</small>")
+    class MVNYJP_MAVEN_APACHE_C448A710 module;
+    SERVICE_APP_D5C99823("Service App<br/><small>1 nodes</small>")
+    class SERVICE_APP_D5C99823 module;
+    APP_SERVICE_A99058AD("App Service<br/><small>1 nodes</small>")
+    class APP_SERVICE_A99058AD module;
+    PROMPTS_SERVICE_APP_1BF23821("Prompts Service App<br/><small>1 nodes</small>")
+    class PROMPTS_SERVICE_APP_1BF23821 module;
+    OTHER_D0941E68("Other<br/><small>3 nodes</small>")
+    class OTHER_D0941E68 module;
+    SERVE_API_35EC8E86 -->|imports x127| TESTS_FIXTURES_B84B1DCC
+    TESTS_FIXTURES_B84B1DCC -->|contains x33| SERVE_API_35EC8E86
+    BUILD_GRAPH_321CBB04 -->|imports x16| SERVE_API_35EC8E86
+    SERVE_API_35EC8E86 -->|imports x9| BUILD_GRAPH_321CBB04
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h4>Architecture Layers</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>Layer</th><th>Nodes</th><th>Communities</th></tr>
+      <tr><td>Extraction Pipeline</td><td>94</td><td><code>2, 12, 22</code></td></tr><tr><td>Graph Build</td><td>156</td><td><code>4, 7, 10, 14, 18, 19, 23, 24, 26</code></td></tr><tr><td>CLI &amp; Skill Installers</td><td>19</td><td><code>13</code></td></tr><tr><td>Serving API</td><td>374</td><td><code>0, 1, 5, 6, 9, 11, 16, 17, 20, 21</code></td></tr><tr><td>Tests &amp; Fixtures</td><td>113</td><td><code>3, 8, 15</code></td></tr><tr><td>Maven Mvn Apache</td><td>5</td><td><code>25</code></td></tr><tr><td>Vite Envdts Frontend</td><td>3</td><td><code>27</code></td></tr><tr><td>Service Prompts Librarypy</td><td>2</td><td><code>28</code></td></tr><tr><td>Tailwindcss Tailwindconfigjs Frontend</td><td>2</td><td><code>29</code></td></tr><tr><td>Mvndebug Maven Apache</td><td>2</td><td><code>30</code></td></tr><tr><td>Mvnyjp Maven Apache</td><td>2</td><td><code>31</code></td></tr><tr><td>Service App</td><td>1</td><td><code>32</code></td></tr><tr><td>App Service</td><td>1</td><td><code>33</code></td></tr><tr><td>Prompts Service App</td><td>1</td><td><code>34</code></td></tr><tr><td>Other</td><td>3</td><td><code>35, 36, 37</code></td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Core Flow</h4>
+    <div class="arrow-chain">Extraction Pipeline -&gt; Graph Build -&gt; Serving API -&gt; Tests &amp; Fixtures -&gt; CLI &amp; Skill Installers -&gt; Maven Mvn Apache -&gt; Vite Envdts Frontend</div>
+  </div>
+</div>
+<div class="grid">
+  <div class="card">
+    <h4>Graph Report Highlights</h4>
+    <ul>
+      <li>778 nodes · 2057 edges · 38 communities (24 shown, 14 thin omitted)</li>
+      <li>Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 118 edges (avg confidence: 0.95)</li>
+      <li>Token cost: 0 input · 0 output</li>
+      <li>1. `getHeaders()` - 39 edges</li>
+      <li>2. `useAuthStore` - 30 edges</li>
+      <li>3. `User` - 23 edges</li>
+    </ul>
+  </div>
+</div>
+<hr>
+<!-- ====== 2. Extraction Pipeline ====== -->
+<h2 id="extract-pipeline">2. Extraction Pipeline</h2>
+<p>Extraction Pipeline groups implementation around backend, com, aipm, services, mostly in aipm/services/ProjectService.java, aipm/services/SprintService.java, aipm/services/TaskService.java. This section covers 94 nodes and 177 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Extraction Pipeline (94 nodes, 177 edges)
+    subgraph extract_pipeline_aipm_controllers_GatewayControl_36e2e606["aipm/controllers/GatewayController.java"]
+        backend_src_main_java_com_aipm_controllers_gatew_20e963f1("GatewayController.java")
+        backend_src_main_java_com_aipm_controllers_gatew_9ab94321("GatewayController<br/><small>aipm/controllers/GatewayController.java</small>")
+        backend_src_main_java_com_aipm_controllers_gatew_bff4e185("GatewayController()<br/><small>aipm/controllers/GatewayController.java</small>")
+        backend_src_main_java_com_aipm_controllers_gatew_6d9f8b3e("proxy()<br/><small>aipm/controllers/GatewayController.java</small>")
+        backend_src_main_java_com_aipm_controllers_gatew_951e078e("SimpleClientHttpRequestFactory<br/><small>aipm/controllers/GatewayController.java</small>")
+        backend_src_main_java_com_aipm_controllers_gatew_2a00bb1f("prepareConnection()<br/><small>aipm/controllers/GatewayController.java</small>")
+    end
+    subgraph extract_pipeline_aipm_services_ProjectService_ja_20ec5a93["aipm/services/ProjectService.java"]
+        backend_src_main_java_com_aipm_services_projects_29d51991("ProjectService.java")
+        backend_src_main_java_com_aipm_services_projects_d1cacac4("ProjectService<br/><small>aipm/services/ProjectService.java</small>")
+        backend_src_main_java_com_aipm_services_projects_9145e027("findAll()<br/><small>aipm/services/ProjectService.java</small>")
+        backend_src_main_java_com_aipm_services_projects_2b765e82("findById()<br/><small>aipm/services/ProjectService.java</small>")
+        backend_src_main_java_com_aipm_services_projects_dadc0f9a("save()<br/><small>aipm/services/ProjectService.java</small>")
+        backend_src_main_java_com_aipm_services_projects_df9f895b("deleteById()<br/><small>aipm/services/ProjectService.java</small>")
+    end
+    subgraph extract_pipeline_aipm_services_SprintService_jav_bc6cdb3b["aipm/services/SprintService.java"]
+        backend_src_main_java_com_aipm_services_sprintse_b16d7d0b("SprintService.java")
+        backend_src_main_java_com_aipm_services_sprintse_1488dd40("SprintService<br/><small>aipm/services/SprintService.java</small>")
+        backend_src_main_java_com_aipm_services_sprintse_e9282dd7("findAll()<br/><small>aipm/services/SprintService.java</small>")
+    end
+    backend_src_main_java_com_aipm_services_taskserv_15fc405c("TaskService.java")
+    backend_src_main_java_com_aipm_services_userserv_087da302("UserService.java")
+    backend_src_main_java_com_aipm_services_userstor_b99bd296("UserStoryService.java")
+    backend_src_main_java_com_aipm_controllers_gatew_9ab94321 -->|method| backend_src_main_java_com_aipm_controllers_gatew_bff4e185
+    backend_src_main_java_com_aipm_controllers_gatew_9ab94321 -->|method| backend_src_main_java_com_aipm_controllers_gatew_6d9f8b3e
+    backend_src_main_java_com_aipm_controllers_gatew_951e078e -->|method| backend_src_main_java_com_aipm_controllers_gatew_2a00bb1f
+    backend_src_main_java_com_aipm_services_projects_d1cacac4 -->|method| backend_src_main_java_com_aipm_services_projects_9145e027
+    backend_src_main_java_com_aipm_services_projects_d1cacac4 -->|method| backend_src_main_java_com_aipm_services_projects_2b765e82
+    backend_src_main_java_com_aipm_services_projects_d1cacac4 -->|method| backend_src_main_java_com_aipm_services_projects_dadc0f9a
+    backend_src_main_java_com_aipm_services_projects_d1cacac4 -->|method| backend_src_main_java_com_aipm_services_projects_df9f895b
+    backend_src_main_java_com_aipm_services_sprintse_1488dd40 -->|method| backend_src_main_java_com_aipm_services_sprintse_e9282dd7
+    %% Omitted for readability: 76 nodes, 0 edges
+    class backend_src_main_java_com_aipm_controllers_gatew_20e963f1 klass;
+    class backend_src_main_java_com_aipm_controllers_gatew_9ab94321 klass;
+    class backend_src_main_java_com_aipm_controllers_gatew_bff4e185 function;
+    class backend_src_main_java_com_aipm_controllers_gatew_6d9f8b3e function;
+    class backend_src_main_java_com_aipm_controllers_gatew_951e078e entry;
+    class backend_src_main_java_com_aipm_controllers_gatew_2a00bb1f function;
+    class backend_src_main_java_com_aipm_services_projects_29d51991 klass;
+    class backend_src_main_java_com_aipm_services_projects_d1cacac4 klass;
+    class backend_src_main_java_com_aipm_services_projects_9145e027 function;
+    class backend_src_main_java_com_aipm_services_projects_2b765e82 function;
+    class backend_src_main_java_com_aipm_services_projects_dadc0f9a function;
+    class backend_src_main_java_com_aipm_services_projects_df9f895b function;
+    class backend_src_main_java_com_aipm_services_sprintse_b16d7d0b klass;
+    class backend_src_main_java_com_aipm_services_sprintse_1488dd40 klass;
+    class backend_src_main_java_com_aipm_services_sprintse_e9282dd7 function;
+    class backend_src_main_java_com_aipm_services_taskserv_15fc405c klass;
+    class backend_src_main_java_com_aipm_services_userserv_087da302 klass;
+    class backend_src_main_java_com_aipm_services_userstor_b99bd296 klass;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>Project</code><br><small style="color:var(--muted)">aipm/models/Project.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>ProjectRepository.java</code><br><small style="color:var(--muted)">aipm/repositories/ProjectRepository.java</small><br><code>ProjectService.java</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Project node in aipm/models/Project.java.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>Sprint</code><br><small style="color:var(--muted)">aipm/models/Sprint.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>SprintRepository.java</code><br><small style="color:var(--muted)">aipm/repositories/SprintRepository.java</small><br><code>SprintService.java</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Sprint node in aipm/models/Sprint.java.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>Task</code><br><small style="color:var(--muted)">aipm/models/Task.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>TaskRepository.java</code><br><small style="color:var(--muted)">aipm/repositories/TaskRepository.java</small><br><code>TaskService.java</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>Task node in aipm/models/Task.java.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>User</code><br><small style="color:var(--muted)">aipm/models/User.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>UserRepository.java</code><br><small style="color:var(--muted)">aipm/repositories/UserRepository.java</small><br><code>UserService.java</code><br><small style="color:var(--muted)">aipm/services/UserService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>User node in aipm/models/User.java.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>UserStory</code><br><small style="color:var(--muted)">aipm/models/UserStory.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>UserStoryRepository.java</code><br><small style="color:var(--muted)">aipm/repositories/UserStoryRepository.java</small><br><code>UserStoryService.java</code><br><small style="color:var(--muted)">aipm/services/UserStoryService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>UserStory node in aipm/models/UserStory.java.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>ProjectRepository</code><br><small style="color:var(--muted)">aipm/repositories/ProjectRepository.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>ProjectService.java</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>ProjectRepository node in aipm/repositories/ProjectRepository.java.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>SprintRepository</code><br><small style="color:var(--muted)">aipm/repositories/SprintRepository.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>SprintService.java</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>SprintRepository node in aipm/repositories/SprintRepository.java.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>TaskRepository</code><br><small style="color:var(--muted)">aipm/repositories/TaskRepository.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>TaskService.java</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>TaskRepository node in aipm/repositories/TaskRepository.java.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>UserRepository</code><br><small style="color:var(--muted)">aipm/repositories/UserRepository.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>UserService.java</code><br><small style="color:var(--muted)">aipm/services/UserService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>UserRepository node in aipm/repositories/UserRepository.java.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>UserStoryRepository</code><br><small style="color:var(--muted)">aipm/repositories/UserStoryRepository.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>UserStoryService.java</code><br><small style="color:var(--muted)">aipm/services/UserStoryService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>UserStoryRepository node in aipm/repositories/UserStoryRepository.java.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>ProjectService</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>deleteById()</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small><br><code>findAll()</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small><br><code>findById()</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small><br>+1 more</td>
+  <td>ProjectService node in aipm/services/ProjectService.java.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>SprintService</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>deleteById()</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small><br><code>findAll()</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small><br><code>findById()</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small><br>+1 more</td>
+  <td>SprintService node in aipm/services/SprintService.java.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>TaskService</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>deleteById()</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small><br><code>findAll()</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small><br><code>findById()</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small><br>+1 more</td>
+  <td>TaskService node in aipm/services/TaskService.java.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>UserService</code><br><small style="color:var(--muted)">aipm/services/UserService.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>deleteById()</code><br><small style="color:var(--muted)">aipm/services/UserService.java</small><br><code>findAll()</code><br><small style="color:var(--muted)">aipm/services/UserService.java</small><br><code>findById()</code><br><small style="color:var(--muted)">aipm/services/UserService.java</small><br>+1 more</td>
+  <td>UserService node in aipm/services/UserService.java.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>UserStoryService</code><br><small style="color:var(--muted)">aipm/services/UserStoryService.java</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>deleteById()</code><br><small style="color:var(--muted)">aipm/services/UserStoryService.java</small><br><code>findAll()</code><br><small style="color:var(--muted)">aipm/services/UserStoryService.java</small><br><code>findById()</code><br><small style="color:var(--muted)">aipm/services/UserStoryService.java</small><br>+1 more</td>
+  <td>UserStoryService node in aipm/services/UserStoryService.java.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>.save()</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProjectService</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.save() node in aipm/services/ProjectService.java.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>.save()</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>SprintService</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.save() node in aipm/services/SprintService.java.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>.save()</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>TaskService</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.save() node in aipm/services/TaskService.java.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>.save()</code><br><small style="color:var(--muted)">aipm/services/UserService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>UserService</code><br><small style="color:var(--muted)">aipm/services/UserService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.save() node in aipm/services/UserService.java.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>.save()</code><br><small style="color:var(--muted)">aipm/services/UserStoryService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>UserStoryService</code><br><small style="color:var(--muted)">aipm/services/UserStoryService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.save() node in aipm/services/UserStoryService.java.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>.deleteById()</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProjectService</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.deleteById() node in aipm/services/ProjectService.java.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>.findAll()</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProjectService</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findAll() node in aipm/services/ProjectService.java.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>.findById()</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProjectService</code><br><small style="color:var(--muted)">aipm/services/ProjectService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findById() node in aipm/services/ProjectService.java.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>.deleteById()</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>SprintService</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.deleteById() node in aipm/services/SprintService.java.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>.findAll()</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>SprintService</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findAll() node in aipm/services/SprintService.java.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>.findById()</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>SprintService</code><br><small style="color:var(--muted)">aipm/services/SprintService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findById() node in aipm/services/SprintService.java.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>.deleteById()</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>TaskService</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.deleteById() node in aipm/services/TaskService.java.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>.findAll()</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>TaskService</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findAll() node in aipm/services/TaskService.java.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>.findById()</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>TaskService</code><br><small style="color:var(--muted)">aipm/services/TaskService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findById() node in aipm/services/TaskService.java.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>.deleteById()</code><br><small style="color:var(--muted)">aipm/services/UserService.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>UserService</code><br><small style="color:var(--muted)">aipm/services/UserService.java</small></td>
+  <td>No direct outbound edge</td>
+  <td>.deleteById() node in aipm/services/UserService.java.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>aipm/controllers/GatewayController.java</code></td><td>6 nodes</td></tr>
+<tr><td><code>aipm/services/ProjectService.java</code></td><td>6 nodes</td></tr>
+<tr><td><code>aipm/services/SprintService.java</code></td><td>6 nodes</td></tr>
+<tr><td><code>aipm/services/TaskService.java</code></td><td>6 nodes</td></tr>
+<tr><td><code>aipm/services/UserService.java</code></td><td>6 nodes</td></tr>
+<tr><td><code>aipm/services/UserStoryService.java</code></td><td>6 nodes</td></tr>
+<tr><td><code>com/aipm/AiProjectManagementApplication.java</code></td><td>3 nodes</td></tr>
+<tr><td><code>aipm/models/Project.java</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: imports x71, references x59, method x24, contains x18. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 3. Graph Build ====== -->
+<h2 id="build-graph">3. Graph Build</h2>
+<p>Graph Build groups implementation around frontend, docker, composeyml, packagejson, mostly in frontend/package.json, docker-compose.yml, docs/docker-compose.yml. This section covers 156 nodes and 182 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Graph Build (156 nodes, 182 edges)
+    subgraph build_graph_frontend_package_json_640d842e["frontend/package.json"]
+        frontend_package_9c7557c1("frontend/package.json")
+        ref_ant_design_icons_f8b7ab5d("@ant-design/icons<br/><small>frontend/package.json</small>")
+        ref_framer_motion_f377d9e2("framer-motion<br/><small>frontend/package.json</small>")
+        ref_vitest_28bb1904("vitest<br/><small>frontend/package.json</small>")
+        ref_vitejs_plugin_react_2811e448("@vitejs/plugin-react<br/><small>frontend/package.json</small>")
+        ref_axios_764701d9("axios<br/><small>frontend/package.json</small>")
+        ref_lucide_react_d9b8ec11("lucide-react<br/><small>frontend/package.json</small>")
+        ref_react_dom_61ea372d("react-dom<br/><small>frontend/package.json</small>")
+        ref_tailwindcss_postcss_086d2a2c("@tailwindcss/postcss<br/><small>frontend/package.json</small>")
+        ref_testing_library_jest_dom_ec1869c5("@testing-library/jest-dom<br/><small>frontend/package.json</small>")
+    end
+    subgraph build_graph_package_json_4e40bfbd["package.json"]
+        package_582681c2("package.json")
+        ref_docker_206584a3("docker<br/><small>package.json</small>")
+    end
+    subgraph build_graph_src_pages_Dashboard_tsx_3b6928b2["src/pages/Dashboard.tsx"]
+        frontend_src_pages_dashboard_7fa3ab61("Dashboard.tsx")
+        frontend_src_pages_dashboard_dashboard_fced7ba2("Dashboard()<br/><small>src/pages/Dashboard.tsx</small>")
+    end
+    subgraph build_graph_src_pages_ProjectList_tsx_85d5b66f["src/pages/ProjectList.tsx"]
+        frontend_src_pages_projectlist_0a883079("ProjectList.tsx")
+        frontend_src_pages_projectlist_projectlist_350a0287("ProjectList()<br/><small>src/pages/ProjectList.tsx</small>")
+    end
+    frontend_vite_config_3ac59d22("vite.config.ts")
+    frontend_src_store_projectstore_useprojectstore_d244ae0a("useProjectStore<br/><small>src/store/projectStore.ts</small>")
+    frontend_src_pages_dashboard_dashboard_fced7ba2 -->|calls| frontend_src_store_projectstore_useprojectstore_d244ae0a
+    frontend_src_pages_projectlist_projectlist_350a0287 -->|calls| frontend_src_store_projectstore_useprojectstore_d244ae0a
+    frontend_src_pages_dashboard_7fa3ab61 -->|imports| frontend_src_store_projectstore_useprojectstore_d244ae0a
+    frontend_src_pages_dashboard_7fa3ab61 -->|imports| ref_ant_design_icons_f8b7ab5d
+    frontend_src_pages_dashboard_7fa3ab61 -->|imports| ref_framer_motion_f377d9e2
+    frontend_src_pages_projectlist_0a883079 -->|imports| frontend_src_store_projectstore_useprojectstore_d244ae0a
+    frontend_src_pages_projectlist_0a883079 -->|imports| ref_ant_design_icons_f8b7ab5d
+    frontend_src_pages_projectlist_0a883079 -->|imports| ref_framer_motion_f377d9e2
+    frontend_vite_config_3ac59d22 -->|imports| ref_vitest_28bb1904
+    frontend_vite_config_3ac59d22 -->|imports| ref_vitejs_plugin_react_2811e448
+    package_582681c2 -->|imports| ref_docker_206584a3
+    frontend_package_9c7557c1 -->|imports| ref_ant_design_icons_f8b7ab5d
+    frontend_package_9c7557c1 -->|imports| ref_axios_764701d9
+    frontend_package_9c7557c1 -->|imports| ref_framer_motion_f377d9e2
+    frontend_package_9c7557c1 -->|imports| ref_lucide_react_d9b8ec11
+    frontend_package_9c7557c1 -->|imports| ref_react_dom_61ea372d
+    frontend_package_9c7557c1 -->|imports| ref_tailwindcss_postcss_086d2a2c
+    frontend_package_9c7557c1 -->|imports| ref_testing_library_jest_dom_ec1869c5
+    frontend_package_9c7557c1 -->|imports| ref_vitejs_plugin_react_2811e448
+    frontend_package_9c7557c1 -->|imports| ref_vitest_28bb1904
+    %% Omitted for readability: 138 nodes, 0 edges
+    class frontend_package_9c7557c1 function;
+    class ref_ant_design_icons_f8b7ab5d function;
+    class ref_framer_motion_f377d9e2 function;
+    class ref_vitest_28bb1904 function;
+    class ref_vitejs_plugin_react_2811e448 function;
+    class ref_axios_764701d9 function;
+    class ref_lucide_react_d9b8ec11 function;
+    class ref_react_dom_61ea372d function;
+    class ref_tailwindcss_postcss_086d2a2c function;
+    class ref_testing_library_jest_dom_ec1869c5 function;
+    class package_582681c2 function;
+    class ref_docker_206584a3 function;
+    class frontend_src_pages_dashboard_7fa3ab61 ui;
+    class frontend_src_pages_dashboard_dashboard_fced7ba2 ui;
+    class frontend_src_pages_projectlist_0a883079 ui;
+    class frontend_src_pages_projectlist_projectlist_350a0287 ui;
+    class frontend_vite_config_3ac59d22 module;
+    class frontend_src_store_projectstore_useprojectstore_d244ae0a ui;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>docker-compose.yml</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>docker-compose.yml node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>build</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>depends_on</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>depends_on node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>environment</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>environment node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>ports</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ports node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>build</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>depends_on</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>depends_on node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>environment</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>environment node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>ports</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ports node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>context</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>context node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>condition</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>condition node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>environment</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>environment node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>healthcheck</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>healthcheck node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>image</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>image node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>ports</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ports node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>volumes</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>volumes node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>db</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>db node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>AI_SERVICE_URL</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>AI_SERVICE_URL node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>DATABASE_PASSWORD</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>DATABASE_PASSWORD node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>DATABASE_URL</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>DATABASE_URL node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>DATABASE_USER</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>DATABASE_USER node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>OPENAI_API_KEY</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>OPENAI_API_KEY node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>POSTGRES_DB</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>POSTGRES_DB node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>POSTGRES_PASSWORD</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>POSTGRES_PASSWORD node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>POSTGRES_USER</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>POSTGRES_USER node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>build</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>depends_on</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>depends_on node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>ports</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ports node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>interval</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>interval node in docker-compose.yml.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>retries</code><br><small style="color:var(--muted)">docker-compose.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>retries node in docker-compose.yml.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>frontend/package.json</code></td><td>54 nodes</td></tr>
+<tr><td><code>docker-compose.yml</code></td><td>43 nodes</td></tr>
+<tr><td><code>docs/docker-compose.yml</code></td><td>26 nodes</td></tr>
+<tr><td><code>frontend/tsconfig.json</code></td><td>19 nodes</td></tr>
+<tr><td><code>src/pages/Dashboard.tsx</code></td><td>5 nodes</td></tr>
+<tr><td><code>package.json</code></td><td>4 nodes</td></tr>
+<tr><td><code>src/pages/ProjectList.tsx</code></td><td>2 nodes</td></tr>
+<tr><td><code>frontend/src/setupTests.ts</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x131, imports x22, declares x20, imports x7. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 4. CLI & Skill Installers ====== -->
+<h2 id="cli-skills">4. CLI &amp; Skill Installers</h2>
+<p>CLI &amp; Skill Installers groups implementation around applicationyml, backend, resources, url, mostly in main/resources/application.yml. This section covers 19 nodes and 18 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: CLI &amp; Skill Installers (19 nodes, 18 edges)
+    backend_src_main_resources_application_99bc81f1("application.yml")
+    backend_src_main_resources_application_spring_c2dad35f("spring<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_spring_da_837d12e0("datasource<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_spring_jp_6b8e12f1("jpa<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_ai_servic_e937e5ed("ai-service<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_jpa_hiber_172f6569("hibernate<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_server_59b52b69("server<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_ai_servic_4201a767("url<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_hibernate_c1232358("ddl-auto<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_jpa_prope_1ac7fed3("properties<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_propertie_487f4aae("hibernate<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_hibernate_fd618104("format_sql<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_server_po_eef53136("port<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_spring_ap_89b476ad("application<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_applicati_befbdd01("name<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_datasourc_bff5b872("password<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_datasourc_356732d4("url<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_datasourc_35b34c11("username<br/><small>main/resources/application.yml</small>")
+    backend_src_main_resources_application_99bc81f1 -->|contains| backend_src_main_resources_application_server_59b52b69
+    backend_src_main_resources_application_99bc81f1 -->|contains| backend_src_main_resources_application_ai_servic_e937e5ed
+    backend_src_main_resources_application_99bc81f1 -->|contains| backend_src_main_resources_application_spring_c2dad35f
+    backend_src_main_resources_application_ai_servic_e937e5ed -->|contains| backend_src_main_resources_application_ai_servic_4201a767
+    backend_src_main_resources_application_jpa_hiber_172f6569 -->|contains| backend_src_main_resources_application_hibernate_c1232358
+    backend_src_main_resources_application_jpa_prope_1ac7fed3 -->|contains| backend_src_main_resources_application_propertie_487f4aae
+    backend_src_main_resources_application_propertie_487f4aae -->|contains| backend_src_main_resources_application_hibernate_fd618104
+    backend_src_main_resources_application_server_59b52b69 -->|contains| backend_src_main_resources_application_server_po_eef53136
+    backend_src_main_resources_application_spring_c2dad35f -->|contains| backend_src_main_resources_application_spring_jp_6b8e12f1
+    backend_src_main_resources_application_spring_c2dad35f -->|contains| backend_src_main_resources_application_spring_ap_89b476ad
+    backend_src_main_resources_application_spring_c2dad35f -->|contains| backend_src_main_resources_application_spring_da_837d12e0
+    backend_src_main_resources_application_spring_ap_89b476ad -->|contains| backend_src_main_resources_application_applicati_befbdd01
+    backend_src_main_resources_application_spring_da_837d12e0 -->|contains| backend_src_main_resources_application_datasourc_bff5b872
+    backend_src_main_resources_application_spring_da_837d12e0 -->|contains| backend_src_main_resources_application_datasourc_356732d4
+    backend_src_main_resources_application_spring_da_837d12e0 -->|contains| backend_src_main_resources_application_datasourc_35b34c11
+    backend_src_main_resources_application_spring_jp_6b8e12f1 -->|contains| backend_src_main_resources_application_jpa_hiber_172f6569
+    backend_src_main_resources_application_spring_jp_6b8e12f1 -->|contains| backend_src_main_resources_application_jpa_prope_1ac7fed3
+    %% Omitted for readability: 1 nodes, 0 edges
+    class backend_src_main_resources_application_99bc81f1 function;
+    class backend_src_main_resources_application_spring_c2dad35f function;
+    class backend_src_main_resources_application_spring_da_837d12e0 function;
+    class backend_src_main_resources_application_spring_jp_6b8e12f1 function;
+    class backend_src_main_resources_application_ai_servic_e937e5ed function;
+    class backend_src_main_resources_application_jpa_hiber_172f6569 function;
+    class backend_src_main_resources_application_server_59b52b69 function;
+    class backend_src_main_resources_application_ai_servic_4201a767 function;
+    class backend_src_main_resources_application_hibernate_c1232358 function;
+    class backend_src_main_resources_application_jpa_prope_1ac7fed3 function;
+    class backend_src_main_resources_application_propertie_487f4aae function;
+    class backend_src_main_resources_application_hibernate_fd618104 function;
+    class backend_src_main_resources_application_server_po_eef53136 function;
+    class backend_src_main_resources_application_spring_ap_89b476ad function;
+    class backend_src_main_resources_application_applicati_befbdd01 function;
+    class backend_src_main_resources_application_datasourc_bff5b872 function;
+    class backend_src_main_resources_application_datasourc_356732d4 function;
+    class backend_src_main_resources_application_datasourc_35b34c11 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>application.yml</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>application.yml node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>ai-service</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ai-service node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>url</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>url node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>name</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>name node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>password</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>password node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>url</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>url node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>username</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>username node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>ddl-auto</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ddl-auto node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>format_sql</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>format_sql node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>hibernate</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>hibernate node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>properties</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>properties node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>show-sql</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>show-sql node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>hibernate</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>hibernate node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>server</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>server node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>port</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>port node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>spring</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>spring node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>application</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>application node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>datasource</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>datasource node in main/resources/application.yml.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>jpa</code><br><small style="color:var(--muted)">main/resources/application.yml</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>jpa node in main/resources/application.yml.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>main/resources/application.yml</code></td><td>19 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x18. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 5. Serving API ====== -->
+<h2 id="serve-api">5. Serving API</h2>
+<p>Serving API groups implementation around app, service, frontend, api, mostly in ai-service/app/schemas.py, src/api/client.ts, app/services/crud.py. This section covers 374 nodes and 1151 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Serving API (374 nodes, 1151 edges)
+    subgraph serve_api_app_services_crud_py_888fc466["app/services/crud.py"]
+        ai_service_app_services_crud_create_comment_a06df8e5("create_comment()<br/><small>app/services/crud.py</small>")
+        ai_service_app_services_crud_create_forecast_c0fd0ce5("create_forecast()<br/><small>app/services/crud.py</small>")
+        ai_service_app_services_crud_create_notification_3b98d5ca("create_notification()<br/><small>app/services/crud.py</small>")
+        ai_service_app_services_crud_create_project_7c450a3c("create_project()<br/><small>app/services/crud.py</small>")
+        ai_service_app_services_crud_add_project_member_35196d31("add_project_member()<br/><small>app/services/crud.py</small>")
+        ai_service_app_services_crud_create_release_4dae2ef5("create_release()<br/><small>app/services/crud.py</small>")
+        ai_service_app_services_crud_update_task_c679cf2b("update_task()<br/><small>app/services/crud.py</small>")
+    end
+    subgraph serve_api_ai_service_app_models_py_1940ca2c["ai-service/app/models.py"]
+        ai_service_app_models_comment_2af117ad("Comment<br/><small>ai-service/app/models.py</small>")
+        ai_service_app_models_forecast_1314f275("Forecast<br/><small>ai-service/app/models.py</small>")
+        ai_service_app_models_notification_a595028d("Notification<br/><small>ai-service/app/models.py</small>")
+        ai_service_app_models_projectmember_de6bfeed("ProjectMember<br/><small>ai-service/app/models.py</small>")
+        ai_service_app_models_release_6627a7e2("Release<br/><small>ai-service/app/models.py</small>")
+    end
+    ai_service_app_api_ai_f9097a1c("ai.py")
+    ai_service_app_api_auth_6711ef09("auth.py")
+    ai_service_app_api_projects_85875ec5("projects.py")
+    frontend_src_app_7da8908b("App.tsx")
+    frontend_src_pages_storiespage_1f7a0af8("StoriesPage.tsx")
+    frontend_src_pages_taskspage_9d5436fd("TasksPage.tsx")
+    ai_service_app_services_crud_create_comment_a06df8e5 -->|calls| ai_service_app_models_comment_2af117ad
+    ai_service_app_services_crud_create_forecast_c0fd0ce5 -->|calls| ai_service_app_models_forecast_1314f275
+    ai_service_app_services_crud_create_notification_3b98d5ca -->|calls| ai_service_app_models_notification_a595028d
+    ai_service_app_services_crud_create_project_7c450a3c -->|calls| ai_service_app_models_projectmember_de6bfeed
+    ai_service_app_services_crud_add_project_member_35196d31 -->|calls| ai_service_app_models_projectmember_de6bfeed
+    ai_service_app_services_crud_create_release_4dae2ef5 -->|calls| ai_service_app_models_release_6627a7e2
+    frontend_src_app_7da8908b -->|imports| frontend_src_pages_storiespage_1f7a0af8
+    frontend_src_app_7da8908b -->|imports| frontend_src_pages_taskspage_9d5436fd
+    %% Omitted for readability: 356 nodes, 0 edges
+    class ai_service_app_services_crud_create_comment_a06df8e5 function;
+    class ai_service_app_services_crud_create_forecast_c0fd0ce5 function;
+    class ai_service_app_services_crud_create_notification_3b98d5ca function;
+    class ai_service_app_services_crud_create_project_7c450a3c function;
+    class ai_service_app_services_crud_add_project_member_35196d31 function;
+    class ai_service_app_services_crud_create_release_4dae2ef5 function;
+    class ai_service_app_services_crud_update_task_c679cf2b function;
+    class ai_service_app_models_comment_2af117ad klass;
+    class ai_service_app_models_forecast_1314f275 klass;
+    class ai_service_app_models_notification_a595028d klass;
+    class ai_service_app_models_projectmember_de6bfeed klass;
+    class ai_service_app_models_release_6627a7e2 klass;
+    class ai_service_app_api_ai_f9097a1c module;
+    class ai_service_app_api_auth_6711ef09 module;
+    class ai_service_app_api_projects_85875ec5 module;
+    class frontend_src_app_7da8908b ui;
+    class frontend_src_pages_storiespage_1f7a0af8 ui;
+    class frontend_src_pages_taskspage_9d5436fd ui;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>AgentThoughtDetail</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>AgentThoughtDetail node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>ConflictItem</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ConflictItem node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>DashboardStats</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>DashboardPage.tsx</code><br><small style="color:var(--muted)">src/pages/DashboardPage.tsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>DashboardStats node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>DeliberationRead</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>AIPage.tsx</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>DeliberationRead node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>DeliberationResponse</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>AIPage.tsx</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>DeliberationResponse node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>Forecast</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>ForecastPage.tsx</code><br><small style="color:var(--muted)">src/pages/ForecastPage.tsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>Forecast node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>Project</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>AIPage.tsx</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small><br><code>DashboardPage.tsx</code><br><small style="color:var(--muted)">src/pages/DashboardPage.tsx</small><br><code>ForecastPage.tsx</code><br><small style="color:var(--muted)">src/pages/ForecastPage.tsx</small><br>+6 more</td>
+  <td>No direct outbound edge</td>
+  <td>Project node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>Risk</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>RisksPage.tsx</code><br><small style="color:var(--muted)">src/pages/RisksPage.tsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>Risk node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>Sprint</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>ForecastPage.tsx</code><br><small style="color:var(--muted)">src/pages/ForecastPage.tsx</small><br><code>ReportsPage.tsx</code><br><small style="color:var(--muted)">src/pages/ReportsPage.tsx</small><br><code>SprintPage.tsx</code><br><small style="color:var(--muted)">src/pages/SprintPage.tsx</small><br>+2 more</td>
+  <td>No direct outbound edge</td>
+  <td>Sprint node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>Task</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>SprintPage.tsx</code><br><small style="color:var(--muted)">src/pages/SprintPage.tsx</small><br><code>TasksPage.tsx</code><br><small style="color:var(--muted)">src/pages/TasksPage.tsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>Task node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>TradeoffOption</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>TradeoffOption node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>User</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>auth.ts</code><br><small style="color:var(--muted)">src/store/auth.ts</small><br><code>TasksPage.tsx</code><br><small style="color:var(--muted)">src/pages/TasksPage.tsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>User node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>UserStory</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>StoriesPage.tsx</code><br><small style="color:var(--muted)">src/pages/StoriesPage.tsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>UserStory node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>Notification</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Notification node in src/pages/AIPage.tsx.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>Notification</code><br><small style="color:var(--muted)">src/pages/ForecastPage.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Notification node in src/pages/ForecastPage.tsx.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>Notification</code><br><small style="color:var(--muted)">src/pages/ProjectsPage.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Notification node in src/pages/ProjectsPage.tsx.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>Notification</code><br><small style="color:var(--muted)">src/pages/RisksPage.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Notification node in src/pages/RisksPage.tsx.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>Notification</code><br><small style="color:var(--muted)">src/pages/SettingsPage.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Notification node in src/pages/SettingsPage.tsx.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>Notification</code><br><small style="color:var(--muted)">src/pages/StoriesPage.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Notification node in src/pages/StoriesPage.tsx.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>Notification</code><br><small style="color:var(--muted)">src/pages/TasksPage.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Notification node in src/pages/TasksPage.tsx.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>AuthState</code><br><small style="color:var(--muted)">src/store/auth.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>AuthState node in src/store/auth.ts.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>PageAccess</code><br><small style="color:var(--muted)">src/utils/roleAccess.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>PageKey</code><br><small style="color:var(--muted)">src/utils/roleAccess.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>RoleName</code><br><small style="color:var(--muted)">src/utils/roleAccess.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>RoleName node in src/utils/roleAccess.ts.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>aiAnalyze()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AIPage()</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small><br><code>AIPage.tsx</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small><br><code>StoriesPage()</code><br><small style="color:var(--muted)">src/pages/StoriesPage.tsx</small><br>+1 more</td>
+  <td><code>getHeaders()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td>Orchestrates analysis and returns structured documentation data.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>aiAssign()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>SprintPage()</code><br><small style="color:var(--muted)">src/pages/SprintPage.tsx</small><br><code>SprintPage.tsx</code><br><small style="color:var(--muted)">src/pages/SprintPage.tsx</small><br><code>TasksPage()</code><br><small style="color:var(--muted)">src/pages/TasksPage.tsx</small><br>+1 more</td>
+  <td><code>getHeaders()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td>aiAssign() node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>aiBreakdown()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AIPage()</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small><br><code>AIPage.tsx</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small><br><code>StoriesPage()</code><br><small style="color:var(--muted)">src/pages/StoriesPage.tsx</small><br>+1 more</td>
+  <td><code>getHeaders()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td>aiBreakdown() node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>aiDeliberate()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AIPage()</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small><br><code>AIPage.tsx</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small></td>
+  <td><code>getHeaders()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td>aiDeliberate() node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>aiForecast()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ForecastPage()</code><br><small style="color:var(--muted)">src/pages/ForecastPage.tsx</small><br><code>ForecastPage.tsx</code><br><small style="color:var(--muted)">src/pages/ForecastPage.tsx</small></td>
+  <td><code>getHeaders()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td>aiForecast() node in src/api/client.ts.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>aiResolveHitl()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AIPage()</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small><br><code>AIPage.tsx</code><br><small style="color:var(--muted)">src/pages/AIPage.tsx</small></td>
+  <td><code>getHeaders()</code><br><small style="color:var(--muted)">src/api/client.ts</small></td>
+  <td>aiResolveHitl() node in src/api/client.ts.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>ai-service/app/schemas.py</code></td><td>70 nodes</td></tr>
+<tr><td><code>src/api/client.ts</code></td><td>56 nodes</td></tr>
+<tr><td><code>app/services/crud.py</code></td><td>38 nodes</td></tr>
+<tr><td><code>app/api/ai.py</code></td><td>17 nodes</td></tr>
+<tr><td><code>app/api/projects.py</code></td><td>14 nodes</td></tr>
+<tr><td><code>app/core/dependencies.py</code></td><td>10 nodes</td></tr>
+<tr><td><code>src/utils/roleAccess.ts</code></td><td>9 nodes</td></tr>
+<tr><td><code>app/api/dashboard.py</code></td><td>8 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x268, imports x244, calls x216, references x154. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 6. Tests & Fixtures ====== -->
+<h2 id="tests-fixtures">6. Tests &amp; Fixtures</h2>
+<p>Tests &amp; Fixtures groups implementation around service, app, services, servicepy, mostly in app/services/ai_service.py, ai-service/app/models.py, ai-service/tests/test_basic.py. This section covers 113 nodes and 331 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Tests &amp; Fixtures (113 nodes, 331 edges)
+    subgraph tests_fixtures_ai_service_tests_test_basic_py_350bf8c6["ai-service/tests/test_basic.py"]
+        ai_service_tests_test_basic_627e3d7a("test_basic.py")
+        ai_service_tests_test_basic_setup_db_a8b71fa3("setup_db()<br/><small>ai-service/tests/test_basic.py</small>")
+        ai_service_tests_test_basic_test_ai_analysis_ret_94cad6e5("enriched structured output()<br/><small>ai-service/tests/test_basic.py</small>")
+        ai_service_tests_test_basic_login_8da242a0("_login()<br/><small>ai-service/tests/test_basic.py</small>")
+    end
+    subgraph tests_fixtures_app_services_ai_service_py_5b9b6077["app/services/ai_service.py"]
+        ai_service_app_services_ai_service_fa440fe9("ai_service.py")
+        ai_service_app_services_ai_service_create_job_480ca33a("_create_job()<br/><small>app/services/ai_service.py</small>")
+        ai_service_app_services_ai_service_record_usage_c2221151("_record_usage()<br/><small>app/services/ai_service.py</small>")
+        ai_service_app_services_ai_service_estimate_toke_0a5ebbb8("_estimate_tokens()<br/><small>app/services/ai_service.py</small>")
+    end
+    subgraph tests_fixtures_ai_service_app_models_py_aa4d2018["ai-service/app/models.py"]
+        ai_service_app_models_aijob_54bf9643("AIJob<br/><small>ai-service/app/models.py</small>")
+        ai_service_app_models_prompthistory_b8f4f7e1("PromptHistory<br/><small>ai-service/app/models.py</small>")
+        ai_service_app_models_aiusage_79bb424e("AIUsage<br/><small>ai-service/app/models.py</small>")
+    end
+    subgraph tests_fixtures_ai_service_app_config_py_59483e8a["ai-service/app/config.py"]
+        ai_service_app_config_get_settings_8300fdc5("get_settings()<br/><small>ai-service/app/config.py</small>")
+        ai_service_app_config_settings_37124e62("Settings<br/><small>ai-service/app/config.py</small>")
+    end
+    subgraph tests_fixtures_ai_service_app_seed_py_553abbd8["ai-service/app/seed.py"]
+        ai_service_app_seed_f875a09c("seed.py")
+        ai_service_app_seed_seed_database_aed05143("seed_database()<br/><small>ai-service/app/seed.py</small>")
+    end
+    subgraph tests_fixtures_app_services_orchestration_servic_a2db87d9["app/services/orchestration_service.py"]
+        ai_service_app_services_orchestration_service_273b6a55("orchestration_service.py")
+        ai_service_app_services_orchestration_service_ex_53fc63c5("multi agent deliberation()<br/><small>app/services/orchestration_service.py</small>")
+    end
+    ai_service_app_db_init_db_5dafdfe8("init_db()<br/><small>ai-service/app/db.py</small>")
+    ai_service_tests_test_basic_setup_db_a8b71fa3 -->|calls| ai_service_app_db_init_db_5dafdfe8
+    ai_service_tests_test_basic_setup_db_a8b71fa3 -->|calls| ai_service_app_seed_seed_database_aed05143
+    ai_service_app_services_ai_service_create_job_480ca33a -->|calls| ai_service_app_models_aijob_54bf9643
+    ai_service_app_services_ai_service_record_usage_c2221151 -->|calls| ai_service_app_services_ai_service_estimate_toke_0a5ebbb8
+    ai_service_app_services_ai_service_record_usage_c2221151 -->|calls| ai_service_app_models_prompthistory_b8f4f7e1
+    ai_service_app_services_ai_service_record_usage_c2221151 -->|calls| ai_service_app_models_aiusage_79bb424e
+    ai_service_app_config_get_settings_8300fdc5 -->|calls| ai_service_app_config_settings_37124e62
+    ai_service_tests_test_basic_test_ai_analysis_ret_94cad6e5 -->|calls| ai_service_tests_test_basic_login_8da242a0
+    ai_service_app_seed_seed_database_aed05143 -->|calls| ai_service_app_db_init_db_5dafdfe8
+    ai_service_app_services_orchestration_service_ex_53fc63c5 -->|calls| ai_service_app_services_ai_service_record_usage_c2221151
+    ai_service_tests_test_basic_627e3d7a -->|imports| ai_service_app_db_init_db_5dafdfe8
+    ai_service_tests_test_basic_627e3d7a -->|imports| ai_service_app_seed_seed_database_aed05143
+    ai_service_tests_test_basic_627e3d7a -->|imports| ai_service_app_seed_f875a09c
+    ai_service_app_seed_f875a09c -->|imports| ai_service_app_config_get_settings_8300fdc5
+    ai_service_app_seed_f875a09c -->|imports| ai_service_app_db_init_db_5dafdfe8
+    ai_service_app_services_orchestration_service_273b6a55 -->|imports| ai_service_app_services_ai_service_record_usage_c2221151
+    ai_service_app_services_orchestration_service_273b6a55 -->|imports| ai_service_app_config_get_settings_8300fdc5
+    ai_service_app_services_orchestration_service_273b6a55 -->|imports| ai_service_app_services_ai_service_fa440fe9
+    ai_service_app_services_ai_service_fa440fe9 -->|imports| ai_service_app_config_get_settings_8300fdc5
+    ai_service_app_services_ai_service_fa440fe9 -->|imports| ai_service_app_models_aijob_54bf9643
+    ai_service_app_services_ai_service_fa440fe9 -->|imports| ai_service_app_models_aiusage_79bb424e
+    ai_service_app_services_ai_service_fa440fe9 -->|imports| ai_service_app_models_prompthistory_b8f4f7e1
+    %% Omitted for readability: 95 nodes, 0 edges
+    class ai_service_tests_test_basic_627e3d7a test;
+    class ai_service_tests_test_basic_setup_db_a8b71fa3 test;
+    class ai_service_tests_test_basic_test_ai_analysis_ret_94cad6e5 test;
+    class ai_service_tests_test_basic_login_8da242a0 test;
+    class ai_service_app_services_ai_service_fa440fe9 module;
+    class ai_service_app_services_ai_service_create_job_480ca33a function;
+    class ai_service_app_services_ai_service_record_usage_c2221151 function;
+    class ai_service_app_services_ai_service_estimate_toke_0a5ebbb8 function;
+    class ai_service_app_models_aijob_54bf9643 klass;
+    class ai_service_app_models_prompthistory_b8f4f7e1 klass;
+    class ai_service_app_models_aiusage_79bb424e klass;
+    class ai_service_app_config_get_settings_8300fdc5 function;
+    class ai_service_app_config_settings_37124e62 klass;
+    class ai_service_app_seed_f875a09c module;
+    class ai_service_app_seed_seed_database_aed05143 function;
+    class ai_service_app_services_orchestration_service_273b6a55 module;
+    class ai_service_app_services_orchestration_service_ex_53fc63c5 function;
+    class ai_service_app_db_init_db_5dafdfe8 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>Settings</code><br><small style="color:var(--muted)">ai-service/app/config.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>get_settings()</code><br><small style="color:var(--muted)">ai-service/app/config.py</small></td>
+  <td>No direct outbound edge</td>
+  <td>Settings node in ai-service/app/config.py.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>Config</code><br><small style="color:var(--muted)">ai-service/app/config.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>AgentDeliberation</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>ai.py</code><br><small style="color:var(--muted)">app/api/ai.py</small><br><code>get_deliberation()</code><br><small style="color:var(--muted)">app/api/ai.py</small><br><code>list_deliberations()</code><br><small style="color:var(--muted)">app/api/ai.py</small><br>+3 more</td>
+  <td>No direct outbound edge</td>
+  <td>AgentDeliberation node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>AgentThought</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>ai.py</code><br><small style="color:var(--muted)">app/api/ai.py</small><br><code>get_deliberation()</code><br><small style="color:var(--muted)">app/api/ai.py</small><br><code>multi agent deliberation()</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small><br>+1 more</td>
+  <td>No direct outbound edge</td>
+  <td>AgentThought node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>AIAgent</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>_create_job()</code><br><small style="color:var(--muted)">app/services/ai_service.py</small><br><code>_run_agent()</code><br><small style="color:var(--muted)">app/services/ai_service.py</small><br><code>ai.py</code><br><small style="color:var(--muted)">app/api/ai.py</small><br>+4 more</td>
+  <td>No direct outbound edge</td>
+  <td>AIAgent node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>AIJob</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>_complete_job()</code><br><small style="color:var(--muted)">app/services/ai_service.py</small><br><code>_create_job()</code><br><small style="color:var(--muted)">app/services/ai_service.py</small><br><code>ai.py</code><br><small style="color:var(--muted)">app/api/ai.py</small><br>+4 more</td>
+  <td>No direct outbound edge</td>
+  <td>AIJob node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>Attachment</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Attachment node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>AuditLog</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>db.py</code><br><small style="color:var(--muted)">ai-service/app/db.py</small><br><code>log_audit()</code><br><small style="color:var(--muted)">ai-service/app/db.py</small></td>
+  <td>No direct outbound edge</td>
+  <td>AuditLog node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>DeliberationResolution</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>ai.py</code><br><small style="color:var(--muted)">app/api/ai.py</small><br><code>get_deliberation()</code><br><small style="color:var(--muted)">app/api/ai.py</small><br><code>orchestration_service.py</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small><br>+1 more</td>
+  <td>No direct outbound edge</td>
+  <td>DeliberationResolution node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>Epic</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>create_epic()</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>crud.py</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>list_epics()</code><br><small style="color:var(--muted)">app/services/crud.py</small><br>+2 more</td>
+  <td>No direct outbound edge</td>
+  <td>Epic node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>Feature</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>create_feature()</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>crud.py</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>list_features()</code><br><small style="color:var(--muted)">app/services/crud.py</small><br>+2 more</td>
+  <td>No direct outbound edge</td>
+  <td>Feature node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>Project</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>can_access_project()</code><br><small style="color:var(--muted)">app/core/dependencies.py</small><br><code>create_project()</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>crud.py</code><br><small style="color:var(--muted)">app/services/crud.py</small><br>+11 more</td>
+  <td>No direct outbound edge</td>
+  <td>Project node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>Risk</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>create_risk()</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>crud.py</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>delete_risk()</code><br><small style="color:var(--muted)">app/api/risks.py</small><br>+9 more</td>
+  <td>No direct outbound edge</td>
+  <td>Risk node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>Role</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>seed.py</code><br><small style="color:var(--muted)">ai-service/app/seed.py</small><br><code>seed_database()</code><br><small style="color:var(--muted)">ai-service/app/seed.py</small></td>
+  <td>No direct outbound edge</td>
+  <td>Role node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>Sprint</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>create_sprint()</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>crud.py</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>get_burndown()</code><br><small style="color:var(--muted)">app/services/reports.py</small><br>+11 more</td>
+  <td>No direct outbound edge</td>
+  <td>Sprint node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>Task</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>ai.py</code><br><small style="color:var(--muted)">app/api/ai.py</small><br><code>ai_service.py</code><br><small style="color:var(--muted)">app/services/ai_service.py</small><br><code>assign()</code><br><small style="color:var(--muted)">app/api/ai.py</small><br>+15 more</td>
+  <td>No direct outbound edge</td>
+  <td>Task node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>UserStory</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>ai_service.py</code><br><small style="color:var(--muted)">app/services/ai_service.py</small><br><code>create_story()</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>crud.py</code><br><small style="color:var(--muted)">app/services/crud.py</small><br>+7 more</td>
+  <td>No direct outbound edge</td>
+  <td>UserStory node in ai-service/app/models.py.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>setup_db()</code><br><small style="color:var(--muted)">ai-service/tests/test_basic.py</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>init_db()</code><br><small style="color:var(--muted)">ai-service/app/db.py</small><br><code>seed_database()</code><br><small style="color:var(--muted)">ai-service/app/seed.py</small></td>
+  <td>setup_db() node in ai-service/tests/test_basic.py.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>get_dashboard_stats()</code><br><small style="color:var(--muted)">app/services/reports.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>dashboard_stats()</code><br><small style="color:var(--muted)">app/api/dashboard.py</small></td>
+  <td><code>AIJob</code><br><small style="color:var(--muted)">ai-service/app/models.py</small><br><code>DashboardStats</code><br><small style="color:var(--muted)">ai-service/app/schemas.py</small><br><code>Project</code><br><small style="color:var(--muted)">ai-service/app/models.py</small><br>+3 more</td>
+  <td>get_dashboard_stats() node in app/services/reports.py.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>get_settings()</code><br><small style="color:var(--muted)">ai-service/app/config.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ai_service.py</code><br><small style="color:var(--muted)">app/services/ai_service.py</small><br><code>create_access_token()</code><br><small style="color:var(--muted)">app/core/security.py</small><br><code>create_refresh_token()</code><br><small style="color:var(--muted)">app/core/security.py</small><br>+6 more</td>
+  <td><code>Settings</code><br><small style="color:var(--muted)">ai-service/app/config.py</small></td>
+  <td>get_settings() node in ai-service/app/config.py.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>get_deliberation()</code><br><small style="color:var(--muted)">app/api/ai.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>AgentDeliberation</code><br><small style="color:var(--muted)">ai-service/app/models.py</small><br><code>AgentThought</code><br><small style="color:var(--muted)">ai-service/app/models.py</small><br><code>DeliberationResolution</code><br><small style="color:var(--muted)">ai-service/app/models.py</small></td>
+  <td>get_deliberation() node in app/api/ai.py.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>hash_password()</code><br><small style="color:var(--muted)">app/core/security.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>create_user()</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>crud.py</code><br><small style="color:var(--muted)">app/services/crud.py</small><br><code>seed.py</code><br><small style="color:var(--muted)">ai-service/app/seed.py</small><br>+1 more</td>
+  <td>No direct outbound edge</td>
+  <td>Caches analysis results or computes cache keys.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>init_db()</code><br><small style="color:var(--muted)">ai-service/app/db.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>main.py</code><br><small style="color:var(--muted)">ai-service/app/main.py</small><br><code>on_startup()</code><br><small style="color:var(--muted)">ai-service/app/main.py</small><br><code>seed.py</code><br><small style="color:var(--muted)">ai-service/app/seed.py</small><br>+3 more</td>
+  <td>No direct outbound edge</td>
+  <td>init_db() node in ai-service/app/db.py.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>log_audit()</code><br><small style="color:var(--muted)">ai-service/app/db.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>create_project()</code><br><small style="color:var(--muted)">app/api/projects.py</small><br><code>projects.py</code><br><small style="color:var(--muted)">app/api/projects.py</small></td>
+  <td><code>AuditLog</code><br><small style="color:var(--muted)">ai-service/app/models.py</small><br><code>json</code></td>
+  <td>log_audit() node in ai-service/app/db.py.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>on_startup()</code><br><small style="color:var(--muted)">ai-service/app/main.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>init_db()</code><br><small style="color:var(--muted)">ai-service/app/db.py</small><br><code>seed_database()</code><br><small style="color:var(--muted)">ai-service/app/seed.py</small></td>
+  <td>on_startup() node in ai-service/app/main.py.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>seed_database()</code><br><small style="color:var(--muted)">ai-service/app/seed.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>main.py</code><br><small style="color:var(--muted)">ai-service/app/main.py</small><br><code>on_startup()</code><br><small style="color:var(--muted)">ai-service/app/main.py</small><br><code>setup_db()</code><br><small style="color:var(--muted)">ai-service/tests/test_basic.py</small><br>+1 more</td>
+  <td><code>AIAgent</code><br><small style="color:var(--muted)">ai-service/app/models.py</small><br><code>Epic</code><br><small style="color:var(--muted)">ai-service/app/models.py</small><br><code>Feature</code><br><small style="color:var(--muted)">ai-service/app/models.py</small><br>+10 more</td>
+  <td>seed_database() node in ai-service/app/seed.py.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>_clean_json_response()</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>multi agent deliberation()</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small></td>
+  <td><code>json</code><br><code>re</code></td>
+  <td>_clean_json_response() node in app/services/orchestration_service.py.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>detect_conflicts()</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>multi agent deliberation()</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small></td>
+  <td>No direct outbound edge</td>
+  <td>detect_conflicts() node in app/services/orchestration_service.py.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>execute_multi_agent_deliberation()</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>deliberate()</code><br><small style="color:var(--muted)">app/api/ai.py</small></td>
+  <td><code>_call_openai()</code><br><small style="color:var(--muted)">app/services/ai_service.py</small><br><code>_clean_json_response()</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small><br><code>_mock_po_reasoning()</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small><br>+10 more</td>
+  <td>execute_multi_agent_deliberation() node in app/services/orchestration_service.py.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>formulate_arbitration()</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>multi agent deliberation()</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small></td>
+  <td><code>_nearest_fibonacci()</code><br><small style="color:var(--muted)">app/services/orchestration_service.py</small></td>
+  <td>formulate_arbitration() node in app/services/orchestration_service.py.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>app/services/ai_service.py</code></td><td>26 nodes</td></tr>
+<tr><td><code>ai-service/app/models.py</code></td><td>18 nodes</td></tr>
+<tr><td><code>ai-service/tests/test_basic.py</code></td><td>14 nodes</td></tr>
+<tr><td><code>app/services/orchestration_service.py</code></td><td>12 nodes</td></tr>
+<tr><td><code>ai-service/app/config.py</code></td><td>4 nodes</td></tr>
+<tr><td><code>app/services/reports.py</code></td><td>4 nodes</td></tr>
+<tr><td><code>ai-service/app/db.py</code></td><td>3 nodes</td></tr>
+<tr><td><code>app/api/ai.py</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: calls x86, contains x74, imports x46, imports x43. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 7. Maven Mvn Apache ====== -->
+<h2 id="maven-mvn-apache">7. Maven Mvn Apache</h2>
+<p>Maven Mvn Apache groups implementation around maven, mvn, apache, 396, mostly in apache-maven-3.9.6/bin/mvn. This section covers 5 nodes and 7 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Maven Mvn Apache (5 nodes, 7 edges)
+    maven_apache_maven_3_9_6_bin_mvn_entry_ce8f6fed("mvn script<br/><small>apache-maven-3.9.6/bin/mvn</small>")
+    maven_apache_maven_3_9_6_bin_mvn_find_maven_base_2e31db4e("find_maven_basedir()<br/><small>apache-maven-3.9.6/bin/mvn</small>")
+    maven_apache_maven_3_9_6_bin_mvn_concat_lines_8a9eef0e("concat_lines()<br/><small>apache-maven-3.9.6/bin/mvn</small>")
+    maven_apache_maven_3_9_6_bin_mvn_find_file_argum_2af69d0d("find_file_argument_basedir()<br/><small>apache-maven-3.9.6/bin/mvn</small>")
+    maven_apache_maven_3_9_6_bin_mvn_8eeffd24("mvn")
+    maven_apache_maven_3_9_6_bin_mvn_entry_ce8f6fed -->|calls| maven_apache_maven_3_9_6_bin_mvn_find_maven_base_2e31db4e
+    maven_apache_maven_3_9_6_bin_mvn_entry_ce8f6fed -->|calls| maven_apache_maven_3_9_6_bin_mvn_concat_lines_8a9eef0e
+    maven_apache_maven_3_9_6_bin_mvn_find_maven_base_2e31db4e -->|calls| maven_apache_maven_3_9_6_bin_mvn_find_file_argum_2af69d0d
+    class maven_apache_maven_3_9_6_bin_mvn_entry_ce8f6fed function;
+    class maven_apache_maven_3_9_6_bin_mvn_find_maven_base_2e31db4e function;
+    class maven_apache_maven_3_9_6_bin_mvn_concat_lines_8a9eef0e function;
+    class maven_apache_maven_3_9_6_bin_mvn_find_file_argum_2af69d0d function;
+    class maven_apache_maven_3_9_6_bin_mvn_8eeffd24 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>mvn</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvn</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>mvn node in apache-maven-3.9.6/bin/mvn.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>mvn script</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvn</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>concat_lines()</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvn</small><br><code>find_maven_basedir()</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvn</small></td>
+  <td>mvn script node in apache-maven-3.9.6/bin/mvn.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>concat_lines()</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvn</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>mvn script</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvn</small></td>
+  <td>No direct outbound edge</td>
+  <td>concat_lines() node in apache-maven-3.9.6/bin/mvn.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>find_file_argument_basedir()</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvn</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>find_maven_basedir()</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvn</small></td>
+  <td>No direct outbound edge</td>
+  <td>find_file_argument_basedir() node in apache-maven-3.9.6/bin/mvn.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>find_maven_basedir()</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvn</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>mvn script</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvn</small></td>
+  <td><code>find_file_argument_basedir()</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvn</small></td>
+  <td>find_maven_basedir() node in apache-maven-3.9.6/bin/mvn.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>apache-maven-3.9.6/bin/mvn</code></td><td>5 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: defines x3, calls x3, contains x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 8. Vite Envdts Frontend ====== -->
+<h2 id="vite-envdts-frontend">8. Vite Envdts Frontend</h2>
+<p>Vite Envdts Frontend groups implementation around vite, envdts, frontend, importmeta, mostly in frontend/src/vite-env.d.ts. This section covers 3 nodes and 2 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Vite Envdts Frontend (3 nodes, 2 edges)
+    frontend_src_vite_env_d_64f4afec("vite-env.d.ts")
+    frontend_src_vite_env_d_importmetaenv_4efdf72e("ImportMetaEnv<br/><small>frontend/src/vite-env.d.ts</small>")
+    frontend_src_vite_env_d_importmeta_1bf05e76("ImportMeta<br/><small>frontend/src/vite-env.d.ts</small>")
+    frontend_src_vite_env_d_64f4afec -->|contains| frontend_src_vite_env_d_importmetaenv_4efdf72e
+    frontend_src_vite_env_d_64f4afec -->|contains| frontend_src_vite_env_d_importmeta_1bf05e76
+    class frontend_src_vite_env_d_64f4afec module;
+    class frontend_src_vite_env_d_importmetaenv_4efdf72e klass;
+    class frontend_src_vite_env_d_importmeta_1bf05e76 klass;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>ImportMeta</code><br><small style="color:var(--muted)">frontend/src/vite-env.d.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ImportMeta node in frontend/src/vite-env.d.ts.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>ImportMetaEnv</code><br><small style="color:var(--muted)">frontend/src/vite-env.d.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ImportMetaEnv node in frontend/src/vite-env.d.ts.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>vite-env.d.ts</code><br><small style="color:var(--muted)">frontend/src/vite-env.d.ts</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in frontend/src/vite-env.d.ts.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>frontend/src/vite-env.d.ts</code></td><td>3 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x2. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 9. Service Prompts Librarypy ====== -->
+<h2 id="service-prompts-librarypy">9. Service Prompts Librarypy</h2>
+<p>Service Prompts Librarypy groups implementation around service, prompts, librarypy, prompt, mostly in ai-service/prompts/library.py. This section covers 2 nodes and 1 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Service Prompts Librarypy (2 nodes, 1 edges)
+    ai_service_prompts_library_rationale_1_e3fb5ae9("Prompt templates for AI agents — aligne...<br/><small>ai-service/prompts/library.py</small>")
+    ai_service_prompts_library_5b8c740c("library.py")
+    ai_service_prompts_library_rationale_1_e3fb5ae9 -->|explains| ai_service_prompts_library_5b8c740c
+    class ai_service_prompts_library_rationale_1_e3fb5ae9 concept;
+    class ai_service_prompts_library_5b8c740c module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>ai-service/prompts/library.py</code><br><small style="color:var(--muted)">ai-service/prompts/library.py</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in ai-service/prompts/library.py.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>Prompt templates for AI agents — aligned with literature on AI in PM (cost,…</code><br><small style="color:var(--muted)">ai-service/prompts/library.py</small></td>
+  <td><span class="tag tag-func">Concept</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Design note for Prompt templates for AI agents — aligned with literature on AI in PM (cost,….</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>ai-service/prompts/library.py</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: explains x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 10. Tailwindcss Tailwindconfigjs Frontend ====== -->
+<h2 id="tailwindcss-tailwindconfigjs-frontend">10. Tailwindcss Tailwindconfigjs Frontend</h2>
+<p>Tailwindcss Tailwindconfigjs Frontend groups implementation around tailwindcss, tailwindconfigjs, frontend, mostly in tailwindcss, frontend/tailwind.config.js. This section covers 2 nodes and 1 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Tailwindcss Tailwindconfigjs Frontend (2 nodes, 1 edges)
+    frontend_tailwind_config_891dbb99("tailwind.config.js")
+    tailwindcss_34a67857("tailwindcss")
+    frontend_tailwind_config_891dbb99 -->|dynamic import| tailwindcss_34a67857
+    class frontend_tailwind_config_891dbb99 module;
+    class tailwindcss_34a67857 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>tailwindcss</code><br><small style="color:var(--muted)">tailwindcss</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>tailwindcss node in tailwindcss.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>tailwind.config.js</code><br><small style="color:var(--muted)">frontend/tailwind.config.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>frontend/tailwind.config.js</code></td><td>1 nodes</td></tr>
+<tr><td><code>tailwindcss</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: dynamic import x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 11. Mvndebug Maven Apache ====== -->
+<h2 id="mvndebug-maven-apache">11. Mvndebug Maven Apache</h2>
+<p>Mvndebug Maven Apache groups implementation around mvndebug, maven, apache, 396, mostly in apache-maven-3.9.6/bin/mvnDebug. This section covers 2 nodes and 1 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Mvndebug Maven Apache (2 nodes, 1 edges)
+    maven_apache_maven_3_9_6_bin_mvndebug_8792453e("mvnDebug")
+    maven_apache_maven_3_9_6_bin_mvndebug_entry_bab958cc("mvnDebug script<br/><small>apache-maven-3.9.6/bin/mvnDebug</small>")
+    maven_apache_maven_3_9_6_bin_mvndebug_8792453e -->|contains| maven_apache_maven_3_9_6_bin_mvndebug_entry_bab958cc
+    class maven_apache_maven_3_9_6_bin_mvndebug_8792453e function;
+    class maven_apache_maven_3_9_6_bin_mvndebug_entry_bab958cc function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>mvnDebug</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvnDebug</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>mvnDebug node in apache-maven-3.9.6/bin/mvnDebug.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>mvnDebug script</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvnDebug</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>mvnDebug script node in apache-maven-3.9.6/bin/mvnDebug.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>apache-maven-3.9.6/bin/mvnDebug</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 12. Mvnyjp Maven Apache ====== -->
+<h2 id="mvnyjp-maven-apache">12. Mvnyjp Maven Apache</h2>
+<p>Mvnyjp Maven Apache groups implementation around mvnyjp, maven, apache, 396, mostly in apache-maven-3.9.6/bin/mvnyjp. This section covers 2 nodes and 1 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Mvnyjp Maven Apache (2 nodes, 1 edges)
+    maven_apache_maven_3_9_6_bin_mvnyjp_5a79e26b("mvnyjp")
+    maven_apache_maven_3_9_6_bin_mvnyjp_entry_932f67ae("mvnyjp script<br/><small>apache-maven-3.9.6/bin/mvnyjp</small>")
+    maven_apache_maven_3_9_6_bin_mvnyjp_5a79e26b -->|contains| maven_apache_maven_3_9_6_bin_mvnyjp_entry_932f67ae
+    class maven_apache_maven_3_9_6_bin_mvnyjp_5a79e26b function;
+    class maven_apache_maven_3_9_6_bin_mvnyjp_entry_932f67ae function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>mvnyjp</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvnyjp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>mvnyjp node in apache-maven-3.9.6/bin/mvnyjp.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>mvnyjp script</code><br><small style="color:var(--muted)">apache-maven-3.9.6/bin/mvnyjp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>mvnyjp script node in apache-maven-3.9.6/bin/mvnyjp.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>apache-maven-3.9.6/bin/mvnyjp</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 13. Service App ====== -->
+<h2 id="service-app">13. Service App</h2>
+<p>Service App groups implementation around service, app, mostly in app/core/__init__.py. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Service App (1 nodes, 0 edges)
+    ai_service_app_core_init_f9e645f5("__init__.py")
+    class ai_service_app_core_init_f9e645f5 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>core/__init__.py</code><br><small style="color:var(--muted)">app/core/__init__.py</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in app/core/__init__.py.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>app/core/__init__.py</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 14. App Service ====== -->
+<h2 id="app-service">14. App Service</h2>
+<p>App Service groups implementation around app, service, mostly in ai-service/app/__init__.py. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: App Service (1 nodes, 0 edges)
+    ai_service_app_init_dc0909bf("__init__.py")
+    class ai_service_app_init_dc0909bf module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>app/__init__.py</code><br><small style="color:var(--muted)">ai-service/app/__init__.py</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in ai-service/app/__init__.py.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>ai-service/app/__init__.py</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 15. Prompts Service App ====== -->
+<h2 id="prompts-service-app">15. Prompts Service App</h2>
+<p>Prompts Service App groups implementation around prompts, service, app, mostly in app/prompts/__init__.py. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Prompts Service App (1 nodes, 0 edges)
+    ai_service_app_prompts_init_5acc40e9("__init__.py")
+    class ai_service_app_prompts_init_5acc40e9 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>prompts/__init__.py</code><br><small style="color:var(--muted)">app/prompts/__init__.py</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in app/prompts/__init__.py.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>app/prompts/__init__.py</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 16. Other ====== -->
+<h2 id="other">16. Other</h2>
+<p>Other groups implementation around postcssconfigjs, frontend, vitestdts, comaipmbackend, mostly in frontend/postcss.config.js, frontend/src/vitest.d.ts, backend/pom.xml. This section covers 3 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Other (3 nodes, 0 edges)
+    pkg_com_aipm_backend_36d77d25("com.aipm:backend<br/><small>backend/pom.xml</small>")
+    frontend_postcss_config_21b874e7("postcss.config.js")
+    frontend_src_vitest_d_08ca664f("vitest.d.ts")
+    class pkg_com_aipm_backend_36d77d25 module;
+    class frontend_postcss_config_21b874e7 module;
+    class frontend_src_vitest_d_08ca664f test;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>postcss.config.js</code><br><small style="color:var(--muted)">frontend/postcss.config.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>vitest.d.ts</code><br><small style="color:var(--muted)">frontend/src/vitest.d.ts</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in frontend/src/vitest.d.ts.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>com.aipm:backend</code><br><small style="color:var(--muted)">backend/pom.xml</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>com.aipm:backend node in backend/pom.xml.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>backend/pom.xml</code></td><td>1 nodes</td></tr>
+<tr><td><code>frontend/postcss.config.js</code></td><td>1 nodes</td></tr>
+<tr><td><code>frontend/src/vitest.d.ts</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<h2 id="stats">Project Statistics</h2>
+
+<div class="grid">
+  <div class="card">
+    <h4>Graph</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>Nodes</td><td>778</td></tr>
+      <tr><td>Edges</td><td>2057</td></tr>
+      <tr><td>Hyperedges</td><td>0</td></tr>
+      <tr><td>Communities</td><td>38</td></tr>
+      <tr><td>Documented Sections</td><td>15</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Edge Confidence</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>EXTRACTED</td><td>1939</td></tr>
+      <tr><td>INFERRED</td><td>118</td></tr>
+      <tr><td>AMBIGUOUS</td><td>0</td></tr>
+    </table>
+  </div>
+</div>
+
+<div style="text-align:center; padding:40px 0; color: var(--muted); font-size:0.9rem;">
+  <p>AI-Driven-Software-Project-Management — Architecture Documentation</p>
+  <p>Generated: 2026-11-11 13:25 UTC · graphify callflow-html</p>
+</div>
+
+</div><!-- .container -->
+
+<script>
+(function () {
+  const mermaidConfig = {
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'loose',
+    flowchart: { htmlLabels: true, useMaxWidth: true },
+    themeVariables: {
+      primaryColor: '#1e293b',
+      primaryTextColor: '#e2e8f0',
+      primaryBorderColor: '#38bdf8',
+      secondaryColor: '#0f172a',
+      tertiaryColor: '#334155',
+      lineColor: '#64748b',
+      textColor: '#e2e8f0',
+    }
+  };
+
+  mermaid.initialize(mermaidConfig);
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function enhanceMermaidDiagrams() {
+    document.querySelectorAll('.mermaid').forEach((container) => {
+      if (container.dataset.zoomReady === 'true') return;
+      const svg = container.querySelector('svg');
+      if (!svg) return;
+
+      container.dataset.zoomReady = 'true';
+      container.classList.add('is-enhanced');
+
+      const viewport = document.createElement('div');
+      viewport.className = 'mermaid-viewport';
+      svg.parentNode.insertBefore(viewport, svg);
+      viewport.appendChild(svg);
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'mermaid-toolbar';
+      toolbar.innerHTML = [
+        '<button type="button" data-action="zoom-out" title="Zoom out">-</button>',
+        '<span class="zoom-level" data-role="level">100%</span>',
+        '<button type="button" data-action="zoom-in" title="Zoom in">+</button>',
+        '<button type="button" data-action="fit" title="Fit width">Fit</button>',
+        '<button type="button" data-action="reset" title="Reset view">Reset</button>'
+      ].join('');
+      container.insertBefore(toolbar, viewport);
+
+      const state = { scale: 1, x: 0, y: 0, dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 };
+      const level = toolbar.querySelector('[data-role="level"]');
+
+      function applyTransform() {
+        svg.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+        level.textContent = `${Math.round(state.scale * 100)}%`;
+      }
+
+      function zoomBy(delta) {
+        state.scale = clamp(state.scale + delta, 0.25, 3);
+        applyTransform();
+      }
+
+      function reset() {
+        state.scale = 1;
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      function fitWidth() {
+        const rawWidth = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width
+          ? svg.viewBox.baseVal.width
+          : svg.getBoundingClientRect().width / state.scale;
+        if (!rawWidth) {
+          reset();
+          return;
+        }
+        state.scale = clamp((viewport.clientWidth - 48) / rawWidth, 0.25, 1.4);
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      toolbar.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        if (action === 'zoom-in') zoomBy(0.15);
+        if (action === 'zoom-out') zoomBy(-0.15);
+        if (action === 'fit') fitWidth();
+        if (action === 'reset') reset();
+      });
+
+      viewport.addEventListener('wheel', (event) => {
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        zoomBy(event.deltaY < 0 ? 0.1 : -0.1);
+      }, { passive: false });
+
+      viewport.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        state.dragging = true;
+        state.startX = event.clientX;
+        state.startY = event.clientY;
+        state.originX = state.x;
+        state.originY = state.y;
+        viewport.classList.add('is-dragging');
+        viewport.setPointerCapture(event.pointerId);
+      });
+
+      viewport.addEventListener('pointermove', (event) => {
+        if (!state.dragging) return;
+        state.x = state.originX + event.clientX - state.startX;
+        state.y = state.originY + event.clientY - state.startY;
+        applyTransform();
+      });
+
+      function endDrag(event) {
+        if (!state.dragging) return;
+        state.dragging = false;
+        viewport.classList.remove('is-dragging');
+        if (viewport.hasPointerCapture(event.pointerId)) {
+          viewport.releasePointerCapture(event.pointerId);
+        }
+      }
+
+      viewport.addEventListener('pointerup', endDrag);
+      viewport.addEventListener('pointercancel', endDrag);
+      applyTransform();
+    });
+  }
+
+  function renderMermaid() {
+    const result = mermaid.run
+      ? mermaid.run({ querySelector: '.mermaid' })
+      : Promise.resolve();
+    Promise.resolve(result)
+      .then(enhanceMermaidDiagrams)
+      .catch((error) => {
+        console.error('Mermaid render failed:', error);
+        enhanceMermaidDiagrams();
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderMermaid);
+  } else {
+    renderMermaid();
+  }
+})();
+</script>
+
+</body>
+</html>

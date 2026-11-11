@@ -266,6 +266,13 @@ def update_risk(session: Session, risk: Risk, data) -> Risk:
     return risk
 
 
+def delete_risk(session: Session, risk: Risk) -> None:
+    from datetime import datetime
+    risk.deleted_at = datetime.utcnow()
+    session.add(risk)
+    session.commit()
+
+
 # Forecasts
 def create_forecast(session: Session, project_id: int, forecast_type: str, value: float, confidence: float, details: str, sprint_id: Optional[int] = None) -> Forecast:
     fc = Forecast(
